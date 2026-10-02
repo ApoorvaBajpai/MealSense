@@ -1,8 +1,12 @@
 /**
  * MealSense Production Authentication View
- * Supports:
- * - Three dedicated evaluation demo accounts (student_testid, staff_testid, admin_testid) with sample data.
- * - Real user self-registrations with a completely clean slate (no dummy data).
+ * PM Upgrade Version 2.0
+ * 
+ * Implements Section 19:
+ * - Role-Based Demo Entry: "Explore as Student", "Explore as Kitchen Staff", "Explore as Administrator"
+ * - Prominent "Start 60-Sec Guided Walkthrough"
+ * - Clear Demo-Data Disclosure Badge
+ * - Clean Slate for Real User Registrations
  */
 
 import { authService } from '../auth.js';
@@ -11,30 +15,103 @@ import { tracker } from '../analytics.js';
 
 export function renderAuthView(container) {
   let activeTab = 'login'; // 'login' | 'signup'
-  let selectedRole = 'student'; // 'student' | 'kitchen' | 'admin'
+  let selectedRole = 'student';
   let errorMessage = '';
 
   function update() {
     container.innerHTML = `
-      <div class="auth-container">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 12px;">
-          <div class="brand-icon" style="width: 52px; height: 52px; font-size: 1.8rem;">🍽️</div>
-          <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--text-primary); margin-top: 4px; letter-spacing: -0.02em;">
-            MealSense Portal
+      <div class="auth-container" style="max-width: 540px; margin: 0 auto; padding: 20px 14px;">
+        <!-- Brand Header -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 20px; text-align: center;">
+          <div class="brand-icon" style="width: 56px; height: 56px; font-size: 2rem;">🍽️</div>
+          <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-top: 4px; letter-spacing: -0.02em;">
+            MealSense
           </h1>
-          <p style="font-size: 0.88rem; color: var(--text-secondary); max-width: 420px; line-height: 1.4;">
-            Institutional Dining & Food Waste Prevention for University Hostels, Messes & Dining Facilities
+          <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 440px; line-height: 1.4; margin: 0;">
+            Institutional Dining & Food Waste Prevention Platform
           </p>
+          <div style="font-size: 0.78rem; font-weight: 600; color: var(--brand-primary); margin-top: 2px;">
+            Closed Loop: Student Intent → Conformal Forecast → Kitchen Prep Decision → Waste Audit
+          </div>
         </div>
 
+        <!-- Section 19.2: Guided 60-Second PM Evaluator Tour CTA Card -->
+        <div class="card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(184, 93, 56, 0.08) 100%); border: 2px solid var(--brand-accent); padding: 18px; margin-bottom: 22px; text-align: center;">
+          <div style="font-size: 0.76rem; font-weight: 800; text-transform: uppercase; color: var(--brand-primary); letter-spacing: 0.05em; margin-bottom: 4px;">
+            ⭐ Product Management Case Study Experience
+          </div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
+            60-Second Closed-Loop Guided Tour
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 14px auto; line-height: 1.4;">
+            Walk through all 5 stages of the product loop across Student, Kitchen, and Admin perspectives with guided step explanations.
+          </p>
+          <button id="btn-start-guided-tour" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem; font-weight: 700;">
+            🚀 Start 60-Second Guided Tour
+          </button>
+        </div>
+
+        <!-- Section 19.1: Role-Based Demo Entry Hub -->
+        <div class="card" style="margin-bottom: 22px; padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">
+              💡 Explore by Role (Demo Sandbox):
+            </div>
+            <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Preloaded Data</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Student Demo Card -->
+            <button class="btn-demo-quick" data-demo-id="student_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.5rem;">🎓</span>
+                <div>
+                  <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Student</div>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">Aarav Sharma • 1-Tap Eat/Skip Intent & My Impact</div>
+                </div>
+              </div>
+              <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
+            </button>
+
+            <!-- Kitchen Demo Card -->
+            <button class="btn-demo-quick" data-demo-id="staff_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.5rem;">👨‍🍳</span>
+                <div>
+                  <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Kitchen Staff</div>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">Chef Rajesh • Decision-First Recommendation & Overrides</div>
+                </div>
+              </div>
+              <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
+            </button>
+
+            <!-- Admin Demo Card -->
+            <button class="btn-demo-quick" data-demo-id="admin_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.5rem;">🏛️</span>
+                <div>
+                  <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Administrator</div>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">Dr. V. K. Verma • Baseline Impact, Insights & SaaS ROI</div>
+                </div>
+              </div>
+              <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
+            </button>
+          </div>
+
+          <!-- Section 19.3: Demo-Data Disclosure Badge -->
+          <div style="background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 14px; border: 1px solid var(--border-subtle); font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
+            ⚠️ <strong>Demo Environment Disclosure:</strong> Preloaded with sample evaluative data for demonstration. Real-world institutional deployments measure actual facility baselines.
+          </div>
+        </div>
+
+        <!-- Custom Account Sign-in / Registration Card -->
         <div class="auth-card">
-          <!-- Auth Mode Tabs -->
           <div class="auth-tabs">
             <button id="tab-login" class="auth-tab-btn ${activeTab === 'login' ? 'active' : ''}">
-              Sign In
+              Sign In with Account
             </button>
             <button id="tab-signup" class="auth-tab-btn ${activeTab === 'signup' ? 'active' : ''}">
-              Register New Account
+              Register Clean Slate
             </button>
           </div>
 
@@ -45,33 +122,6 @@ export function renderAuthView(container) {
           ` : ''}
 
           ${activeTab === 'login' ? renderLoginForm() : renderSignupForm(selectedRole)}
-
-          <!-- Evaluation Demo Testing IDs Box -->
-          <div style="margin-top: 22px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-align: left;">
-            <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
-              💡 First-Time Evaluator Demo IDs:
-            </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
-              Testing the app for the first time? Use these demo IDs to explore with sample data:
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              <button class="btn-demo-quick" data-demo-id="student_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 7px 12px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; font-size: 0.82rem; font-family: inherit;">
-                <span>🎓 <strong>student_testid</strong> (Resident Student)</span>
-                <span style="font-size: 0.72rem; color: var(--brand-primary); font-weight: 700;">Try Demo →</span>
-              </button>
-              <button class="btn-demo-quick" data-demo-id="staff_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 7px 12px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; font-size: 0.82rem; font-family: inherit;">
-                <span>👨‍🍳 <strong>staff_testid</strong> (Kitchen Chef & Planning)</span>
-                <span style="font-size: 0.72rem; color: var(--brand-primary); font-weight: 700;">Try Demo →</span>
-              </button>
-              <button class="btn-demo-quick" data-demo-id="admin_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 7px 12px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; font-size: 0.82rem; font-family: inherit;">
-                <span>🛡️ <strong>admin_testid</strong> (Warden / Mess Admin)</span>
-                <span style="font-size: 0.72rem; color: var(--brand-primary); font-weight: 700;">Try Demo →</span>
-              </button>
-            </div>
-            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 6px;">
-              <em>Note:</em> Real user signups load a clean operational slate with zero test data.
-            </div>
-          </div>
         </div>
       </div>
     `;
@@ -83,23 +133,16 @@ export function renderAuthView(container) {
     return `
       <form id="form-login" autocomplete="off">
         <div class="form-group">
-          <label class="form-label" for="login-email">Registered Email or Demo ID</label>
-          <input type="text" id="login-email" class="form-input" placeholder="e.g. your_email@mess.edu or demo ID" value="" required autocomplete="off">
+          <label class="form-label" for="login-email">Email or Demo ID</label>
+          <input type="text" id="login-email" class="form-input" placeholder="e.g. student_testid or custom email" value="" required autocomplete="off">
         </div>
         <div class="form-group">
           <label class="form-label" for="login-password">Password</label>
-          <input type="password" id="login-password" class="form-input" placeholder="Enter your password (or 'demo')" value="" required autocomplete="new-password">
+          <input type="password" id="login-password" class="form-input" placeholder="Enter password (or 'demo')" value="" required autocomplete="new-password">
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-          Sign In to Your Dashboard
+          Sign In
         </button>
-
-        <div style="margin-top: 18px; text-align: center; font-size: 0.84rem; color: var(--text-secondary);">
-          Don't have an account registered yet? 
-          <a href="#" id="link-go-signup" style="color: var(--brand-primary); font-weight: 700; text-decoration: underline;">
-            Register your mess profile
-          </a>
-        </div>
       </form>
     `;
   }
@@ -107,8 +150,7 @@ export function renderAuthView(container) {
   function renderSignupForm(role) {
     return `
       <form id="form-signup" autocomplete="off">
-        <!-- Role Selection -->
-        <label class="form-label" style="margin-bottom: 8px; display: block;">Select Your Role in the Mess</label>
+        <label class="form-label" style="margin-bottom: 8px; display: block;">Select Role</label>
         <div class="role-selector-grid">
           <div class="role-option-card ${role === 'student' ? 'selected' : ''}" data-role="student">
             <div class="role-option-icon">🎓</div>
@@ -119,101 +161,85 @@ export function renderAuthView(container) {
             <div class="role-option-title">Kitchen Staff / Chef</div>
           </div>
           <div class="role-option-card ${role === 'admin' ? 'selected' : ''}" data-role="admin">
-            <div class="role-option-icon">🛡️</div>
+            <div class="role-option-icon">🏛️</div>
             <div class="role-option-title">Warden / Admin</div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="signup-name">Full Name</label>
-          <input type="text" id="signup-name" class="form-input" placeholder="e.g. Diya Sharma" value="" required autocomplete="off">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="e.g. Siddharth Verma" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="signup-email">Email Address</label>
-          <input type="email" id="signup-email" class="form-input" placeholder="e.g. diya.sharma@hostel.edu" value="" required autocomplete="off">
+          <label class="form-label" for="reg-email">Official Email</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="e.g. user@campus.edu" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="signup-password">Create Password</label>
-          <input type="password" id="signup-password" class="form-input" placeholder="Minimum 6 characters" minlength="6" value="" required autocomplete="new-password">
+          <label class="form-label" for="reg-hostel">Dining Facility / Hostel</label>
+          <input type="text" id="reg-hostel" class="form-input" placeholder="e.g. Tagore Hostel Mess" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="signup-institution">Institution / University / Organization</label>
-          <input type="text" id="signup-institution" class="form-input" placeholder="e.g. Indian Institute of Technology" value="" required autocomplete="off">
+          <label class="form-label" for="reg-password">Password</label>
+          <input type="password" id="reg-password" class="form-input" placeholder="Choose a password" required minlength="4">
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="signup-hostel">Hostel Dining Hall / Mess Name</label>
-          <input type="text" id="signup-hostel" class="form-input" placeholder="e.g. Ganga Hostel Mess or North Dining Hall" value="" required autocomplete="off">
-        </div>
-
-        ${role === 'student' ? `
-          <div class="form-group">
-            <label class="form-label" for="signup-block">Block / Wing & Room Number</label>
-            <input type="text" id="signup-block" class="form-input" placeholder="e.g. Block B, Room 304" value="" required autocomplete="off">
-          </div>
-          <div style="display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px 0;">
-            <input type="checkbox" id="chk-privacy-consent" style="margin-top: 4px; accent-color: var(--brand-primary);" required checked>
-            <label for="chk-privacy-consent" style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4;">
-              I consent to meal intent processing under DPDP privacy standards. My individual Eat/Skip choices are processed anonymously and hidden from mess staff.
-            </label>
-          </div>
-        ` : `
-          <div class="form-group">
-            <label class="form-label" for="signup-block">Department / Staff Designation</label>
-            <input type="text" id="signup-block" class="form-input" placeholder="${role === 'kitchen' ? 'Head Chef / Catering Incharge' : 'Hostel Warden / Mess Secretary'}" value="" required autocomplete="off">
-          </div>
-        `}
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
-          Register Account & Open Dashboard
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+          Register Clean Slate Account
         </button>
-
-        <div style="margin-top: 18px; text-align: center; font-size: 0.84rem; color: var(--text-secondary);">
-          Already have an account? 
-          <a href="#" id="link-go-login" style="color: var(--brand-primary); font-weight: 700; text-decoration: underline;">
-            Sign In here
-          </a>
-        </div>
       </form>
     `;
   }
 
   function attachEvents() {
-    container.querySelector('#tab-login').onclick = () => {
-      activeTab = 'login';
-      errorMessage = '';
-      update();
-    };
+    // Guided Tour launcher
+    const btnTour = container.querySelector('#btn-start-guided-tour');
+    if (btnTour) {
+      btnTour.addEventListener('click', async () => {
+        await store.startGuidedTour();
+      });
+    }
 
-    container.querySelector('#tab-signup').onclick = () => {
-      activeTab = 'signup';
-      errorMessage = '';
-      update();
-    };
+    // Tab buttons
+    const tabLogin = container.querySelector('#tab-login');
+    const tabSignup = container.querySelector('#tab-signup');
+    if (tabLogin && tabSignup) {
+      tabLogin.onclick = () => { activeTab = 'login'; errorMessage = ''; update(); };
+      tabSignup.onclick = () => { activeTab = 'signup'; errorMessage = ''; update(); };
+    }
 
-    const linkGoSignup = container.querySelector('#link-go-signup');
-    if (linkGoSignup) {
-      linkGoSignup.onclick = (e) => {
+    // Quick demo buttons
+    container.querySelectorAll('.btn-demo-quick').forEach(btn => {
+      btn.onclick = async () => {
+        const demoId = btn.dataset.demoId;
+        try {
+          await store.login(demoId, 'demo');
+          tracker.track('auth.login_completed', { role: store.currentUser.role, is_demo: true });
+          window.showToast(`Logged in as ${store.currentUser.name}`, 'success');
+        } catch (e) {
+          errorMessage = e.message;
+          update();
+        }
+      };
+    });
+
+    // Login Form Submit
+    const formLogin = container.querySelector('#form-login');
+    if (formLogin) {
+      formLogin.onsubmit = async (e) => {
         e.preventDefault();
-        activeTab = 'signup';
-        errorMessage = '';
-        update();
+        const id = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-password').value;
+        try {
+          await store.login(id, pass);
+          tracker.track('auth.login_completed', { role: store.currentUser.role, is_demo: false });
+          window.showToast(`Welcome back, ${store.currentUser.name}!`, 'success');
+        } catch (err) {
+          errorMessage = err.message;
+          update();
+        }
       };
     }
 
-    const linkGoLogin = container.querySelector('#link-go-login');
-    if (linkGoLogin) {
-      linkGoLogin.onclick = (e) => {
-        e.preventDefault();
-        activeTab = 'login';
-        errorMessage = '';
-        update();
-      };
-    }
-
+    // Role option cards in registration
     container.querySelectorAll('.role-option-card').forEach(card => {
       card.onclick = () => {
         selectedRole = card.dataset.role;
@@ -221,69 +247,20 @@ export function renderAuthView(container) {
       };
     });
 
-    // Demo quick login triggers
-    container.querySelectorAll('.btn-demo-quick').forEach(btn => {
-      btn.onclick = async () => {
-        const demoId = btn.dataset.demoId;
-        try {
-          const session = await store.login(demoId, 'demo');
-          tracker.track('app_opened', { role: session.role, source: 'demo_quick' });
-          window.showToast(`Logged in as ${session.name}`, 'success');
-        } catch (err) {
-          errorMessage = err.message;
-          update();
-        }
-      };
-    });
-
-    const loginForm = container.querySelector('#form-login');
-    if (loginForm) {
-      const emailInput = container.querySelector('#login-email');
-      const passInput = container.querySelector('#login-password');
-      if (emailInput) emailInput.value = '';
-      if (passInput) passInput.value = '';
-
-      loginForm.onsubmit = async (e) => {
+    // Registration Form Submit
+    const formSignup = container.querySelector('#form-signup');
+    if (formSignup) {
+      formSignup.onsubmit = async (e) => {
         e.preventDefault();
-        const identifier = (container.querySelector('#login-email').value || '').trim();
-        const password = container.querySelector('#login-password').value || '';
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const hostelName = document.getElementById('reg-hostel').value;
+        const password = document.getElementById('reg-password').value;
 
         try {
-          const session = await store.login(identifier, password);
-          tracker.track('app_opened', { role: session.role, source: 'login_form' });
-          window.showToast(`Welcome, ${session.name}!`, 'success');
-        } catch (err) {
-          errorMessage = err.message;
-          update();
-        }
-      };
-    }
-
-    const signupForm = container.querySelector('#form-signup');
-    if (signupForm) {
-      container.querySelectorAll('#form-signup input:not([type="checkbox"])').forEach(input => input.value = '');
-
-      signupForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const name = container.querySelector('#signup-name').value;
-        const email = container.querySelector('#signup-email').value;
-        const password = container.querySelector('#signup-password').value;
-        const institution = container.querySelector('#signup-institution').value;
-        const hostelName = container.querySelector('#signup-hostel').value;
-        const block = container.querySelector('#signup-block')?.value || '';
-
-        try {
-          const session = await store.signup({
-            name,
-            email,
-            password,
-            role: selectedRole,
-            institution,
-            hostelName,
-            block,
-          });
-          tracker.track('app_opened', { role: selectedRole, source: 'signup_form' });
-          window.showToast(`Account registered for ${name}!`, 'success');
+          await store.signup({ name, email, password, role: selectedRole, hostelName });
+          tracker.track('auth.signup_completed', { role: selectedRole });
+          window.showToast('Account registered successfully with clean operational state!', 'success');
         } catch (err) {
           errorMessage = err.message;
           update();

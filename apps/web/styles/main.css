@@ -454,3 +454,65 @@ body {
     padding: 20px 14px 60px 14px;
   }
 }
+
+/* ==========================================================================
+   Guided 60-Second PM Tour Banner Styling
+   ========================================================================== */
+.guided-tour-banner {
+  background: var(--bg-surface-elevated);
+  border-bottom: 2px solid var(--brand-accent);
+  box-shadow: 0 4px 16px rgba(44, 31, 23, 0.08);
+  padding: 12px 24px;
+  position: sticky;
+  top: 67px;
+  z-index: 85;
+  transition: all var(--transition-fast);
+}
+
+.guided-tour-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tour-step-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--brand-accent);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.tour-content-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.tour-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.tour-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.tour-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
