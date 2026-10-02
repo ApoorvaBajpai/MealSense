@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MealSense — Institutional Dining & Food Waste Prevention</title>
+  <meta name="description" content="Production institutional dining and mess food waste reduction platform enforcing intent tracking, conformal ML forecasting, and zero-trust privacy.">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f6f3ed">
+
+  <!-- Typography: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design System Stylesheets: Warm Beige & Brown Palette -->
+  <link rel="stylesheet" href="styles/design-tokens.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/student.css">
+  <link rel="stylesheet" href="styles/kitchen.css">
+  <link rel="stylesheet" href="styles/admin.css">
+</head>
+<body>
+
+  <!-- Header with Brand and Session Controls -->
+  <header class="app-header">
+    <a href="#" class="brand">
+      <div class="brand-icon">🍽️</div>
+      <div>
+        <div class="brand-title">MealSense</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Dining Intelligence Platform</div>
+      </div>
+    </a>
+
+    <!-- Populated dynamically by app.js (User Profile + Logout only; NO role switcher) -->
+    <div id="header-nav-container" style="display: flex; align-items: center; gap: 14px;"></div>
+  </header>
+
+  <!-- Dynamic Authorized Role Viewport -->
+  <main class="app-main" id="view-container">
+    <!-- Rendered dynamically by js/app.js based strictly on authenticated role -->
+  </main>
+
+  <!-- Universal Modal Overlay -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content" id="modal-body">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <!-- Accessible Toast Notification Hub -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Modules -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

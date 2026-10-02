@@ -1,0 +1,107 @@
+/* ==========================================================================
+   MealSense Design System Tokens: Warm Beige & Espresso Brown Theme
+   Sophisticated, tactile, editorial aesthetic inspired by natural linen, 
+   warm parchment, toasted wheat, rich caramel, and deep espresso.
+   ========================================================================== */
+
+:root {
+  /* Default: Warm Beige & Cream Light Palette */
+  --bg-primary: #f6f3ed;          /* Soft warm linen / oatmeal */
+  --bg-secondary: #eee9df;        /* Toasted almond / pale sand */
+  --bg-surface: #ffffff;          /* Crisp warm parchment */
+  --bg-surface-elevated: #faf7f2; /* Cream card elevated */
+  --bg-glass: rgba(246, 243, 237, 0.88);
+  --border-color: #e2dbce;        /* Muted sand border */
+  --border-subtle: #eee7dc;
+  --border-focus: #7a4620;        /* Warm coffee outline */
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --text-primary: #231c16;        /* Deep roasted espresso */
+  --text-secondary: #5c4f44;      /* Warm roasted walnut / taupe */
+  --text-muted: #8c7d70;          /* Soft stone / dried clay */
+  --text-inverse: #fcf9f5;
+
+  /* Brand Accents (Chestnut, Caramel, Terracotta) */
+  --brand-primary: #63391b;       /* Rich chestnut brown */
+  --brand-hover: #4d2a13;
+  --brand-accent: #c47c2b;        /* Warm caramel amber */
+  --brand-gradient: linear-gradient(135deg, #6b3e1f 0%, #9a5828 50%, #b86e33 100%);
+  --brand-glow: rgba(99, 57, 27, 0.18);
+
+  /* Semantic State Colors (Harmonized with earthy palette) */
+  --color-eat: #2d6a4f;           /* Earthy forest sage */
+  --color-eat-bg: rgba(45, 106, 79, 0.10);
+  --color-eat-border: rgba(45, 106, 79, 0.35);
+
+  --color-skip: #73675c;          /* Warm stone taupe */
+  --color-skip-bg: rgba(115, 103, 92, 0.12);
+  --color-skip-border: rgba(115, 103, 92, 0.35);
+
+  --color-warning: #b45309;       /* Deep amber / burnt honey */
+  --color-warning-bg: rgba(180, 83, 9, 0.10);
+
+  --color-danger: #9f2a1c;        /* Terracotta rust / dried brick */
+  --color-danger-bg: rgba(159, 42, 28, 0.10);
+
+  --color-info: #43615f;          /* Muted slate / river stone */
+  --color-info-bg: rgba(67, 97, 95, 0.10);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(60, 45, 30, 0.06);
+  --shadow-md: 0 4px 10px rgba(60, 45, 30, 0.08), 0 1px 3px rgba(60, 45, 30, 0.04);
+  --shadow-lg: 0 12px 28px rgba(60, 45, 30, 0.11), 0 4px 10px rgba(60, 45, 30, 0.06);
+  --shadow-glow: 0 4px 16px var(--brand-glow);
+
+  /* Geometry & Touch Targets */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --touch-target: 48px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode: Deep Espresso & Dark Chocolate */
+[data-theme="dark"] {
+  --bg-primary: #15110e;          /* Dark roast coffee bean */
+  --bg-secondary: #1e1915;        /* Deep espresso background */
+  --bg-surface: #27211c;          /* Warm cocoa card surface */
+  --bg-surface-elevated: #332b25; /* Elevated cocoa pod */
+  --bg-glass: rgba(30, 24, 20, 0.88);
+  --border-color: #3d342d;
+  --border-subtle: #302923;
+  --border-focus: #c47c2b;
+
+  --text-primary: #f6f1ea;        /* Pale oat milk cream */
+  --text-secondary: #c2b5a6;      /* Toasted hazelnut */
+  --text-muted: #8c7e71;          /* Warm shadow */
+  --text-inverse: #1c1612;
+
+  --brand-primary: #c47c2b;       /* Warm roasted caramel in dark */
+  --brand-hover: #dc8c33;
+  --brand-accent: #e59846;
+  --brand-gradient: linear-gradient(135deg, #a75d22 0%, #c47c2b 100%);
+  --brand-glow: rgba(196, 124, 43, 0.25);
+
+  --color-eat: #48a876;
+  --color-eat-bg: rgba(72, 168, 118, 0.16);
+  --color-eat-border: rgba(72, 168, 118, 0.35);
+
+  --color-skip: #998c7e;
+  --color-skip-bg: rgba(153, 140, 126, 0.15);
+  --color-skip-border: rgba(153, 140, 126, 0.3);
+
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+
+  --color-danger: #ef5350;
+  --color-danger-bg: rgba(239, 83, 80, 0.16);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.45);
+}

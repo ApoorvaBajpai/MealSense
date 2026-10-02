@@ -1,0 +1,291 @@
+/* ==========================================================================
+   Kitchen Dashboard Styling: Warm Beige & Brown Theme
+   ========================================================================== */
+
+.kitchen-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Meal Tabs */
+.kitchen-tabs {
+  display: flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  gap: 6px;
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.kitchen-tab-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.kitchen-tab-btn:hover {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+}
+
+.kitchen-tab-btn.active {
+  background: var(--brand-gradient);
+  color: #fffaf4;
+  box-shadow: var(--shadow-sm);
+}
+
+.kitchen-tab-sub {
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+/* Planning Grid */
+.planning-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .planning-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Live Intent Stats Ribbon */
+.live-intent-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-subtle);
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--color-eat);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--color-eat);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 10px var(--color-eat);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 106, 79, 0.6); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(45, 106, 79, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 106, 79, 0); }
+}
+
+.intent-counts-group {
+  display: flex;
+  gap: 24px;
+}
+
+.intent-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.intent-stat-num {
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.intent-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* RangeBar: Conformal Prediction Visualizer */
+.range-bar-wrapper {
+  margin: 22px 0;
+  padding: 18px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.range-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.range-track {
+  position: relative;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-full);
+  margin: 16px 0;
+}
+
+[data-theme="dark"] .range-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.range-interval {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  background: linear-gradient(90deg, rgba(196, 124, 43, 0.25), rgba(99, 57, 27, 0.35));
+  border: 1.5px solid var(--brand-accent);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+}
+
+[data-theme="dark"] .range-interval {
+  color: #f6ad55;
+}
+
+.marker-expected {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 4px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.marker-label {
+  position: absolute;
+  bottom: -22px;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Prep Buffer Control */
+.buffer-control-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-secondary);
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.buffer-slider {
+  width: 100%;
+  accent-color: var(--brand-primary);
+  height: 7px;
+  cursor: pointer;
+}
+
+.suggested-prep-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 8px;
+}
+
+.suggested-prep-num {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+  line-height: 1.1;
+}
+
+[data-theme="dark"] .suggested-prep-num {
+  color: var(--brand-accent);
+}
+
+/* Outcome Wizard */
+.stepper-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stepper-btn {
+  width: 48px;
+  height: 48px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.stepper-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--brand-accent);
+}
+
+.number-input {
+  flex: 1;
+  height: 48px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: center;
+  font-family: inherit;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+/* Result Card */
+.result-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
