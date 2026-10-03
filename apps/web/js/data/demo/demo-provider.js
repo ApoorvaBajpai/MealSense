@@ -10,7 +10,7 @@ import { DEMO_BASELINE } from './demo-baseline.js';
 import { generateDemoEvents } from './demo-events.js';
 import { DEMO_EXPERIMENTS } from './demo-experiments.js';
 
-const DEMO_STORAGE_KEY = 'mealsense_demo_state_v2';
+const DEMO_STORAGE_KEY = 'mealsense_demo_state_v3';
 
 export class DemoDataProvider {
   constructor() {
@@ -23,18 +23,20 @@ export class DemoDataProvider {
       const stored = localStorage.getItem(DEMO_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        this.facility = parsed.facility;
-        this.meals = parsed.meals;
-        this.intentCounts = parsed.intentCounts;
-        this.predictions = parsed.predictions;
-        this.kitchenDecisions = parsed.kitchenDecisions;
-        this.outcomes = parsed.outcomes;
-        this.studentResponses = parsed.studentResponses || [];
-        this.auditLogs = parsed.auditLogs || [];
-        this.events = parsed.events || generateDemoEvents();
-        this.experiments = parsed.experiments || DEMO_EXPERIMENTS;
-        this.baseline = parsed.baseline || DEMO_BASELINE;
-        return;
+        if (parsed.meals && parsed.meals.length >= 30) {
+          this.facility = parsed.facility;
+          this.meals = parsed.meals;
+          this.intentCounts = parsed.intentCounts;
+          this.predictions = parsed.predictions;
+          this.kitchenDecisions = parsed.kitchenDecisions;
+          this.outcomes = parsed.outcomes;
+          this.studentResponses = parsed.studentResponses || [];
+          this.auditLogs = parsed.auditLogs || [];
+          this.events = parsed.events || generateDemoEvents();
+          this.experiments = parsed.experiments || DEMO_EXPERIMENTS;
+          this.baseline = parsed.baseline || DEMO_BASELINE;
+          return;
+        }
       }
     } catch (e) {
       console.warn('Could not load demo state from localStorage, initializing fresh seed', e);

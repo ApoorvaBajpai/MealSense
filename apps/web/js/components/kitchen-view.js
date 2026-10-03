@@ -81,12 +81,24 @@ export function renderKitchenView(container) {
   let lower = 334;
   let upper = 362;
   let modelVersion = 'v1-intent';
+  let sampleCount = Object.keys(provider.getAllOutcomes() || {}).length;
+  let generatedAt = '10:05 AM';
 
   if (predSnapshot && typeof predSnapshot.prediction === 'number') {
     predicted = predSnapshot.prediction;
     lower = predSnapshot.lowerBound;
     upper = predSnapshot.upperBound;
     modelVersion = predSnapshot.modelVersion || 'v1-intent';
+    if (typeof predSnapshot.sampleCount === 'number') {
+      sampleCount = predSnapshot.sampleCount;
+    }
+    if (predSnapshot.generatedAt) {
+      try {
+        generatedAt = new Date(predSnapshot.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        generatedAt = '10:05 AM';
+      }
+    }
   } else {
     // Dynamic fallback calculation
     const unresponded = Math.max(0, registered - (intent.nEat || 0) - (intent.nSkip || 0));
@@ -103,7 +115,7 @@ export function renderKitchenView(container) {
   const isDecisionMade = Boolean(existingDecision);
   const prepTarget = isDecisionMade ? existingDecision.selectedQuantity : suggestedServings;
 
-  // Conformal RangeBar percentages
+  // Prediction interval RangeBar percentages
   const leftPct = Math.round((lower / registered) * 100);
   const widthPct = Math.max(4, Math.round(((upper - lower) / registered) * 100));
   const expectedPct = Math.round((predicted / registered) * 100);
@@ -259,19 +271,31 @@ export function renderKitchenView(container) {
           <!-- Section 8.2: Expandable Advanced Forecast Details Accordion -->
           <details style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px; border: 1px solid var(--border-subtle);">
             <summary style="font-size: 0.88rem; font-weight: 800; color: var(--brand-primary); cursor: pointer; user-select: none;">
-              🔍 Advanced Forecast Details & Prediction Snapshot
+              🔍 Forecast Provenance & Model Specification (${modelVersion})
             </summary>
             <div style="margin-top: 14px;">
               <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px;">
-                <div><strong>Model Source of Truth:</strong> <code>${modelVersion}</code> (Conformal Quantile Engine)</div>
-                <div><strong>Historical Model MAE:</strong> Trailing Error = <strong>${metricSummary.forecastMae} heads</strong></div>
-                <div><strong>Conformal 80% Coverage:</strong> Projected attendance is guaranteed between <strong>${lower}</strong> and <strong>${upper}</strong> heads at 80% nominal coverage.</div>
+                <div><strong>Model Version:</strong> <code>${modelVersion}</code> — ${modelVersion === 'v0-naive' ? 'Cold-start heuristic baseline' : 'Intent-weighted operational forecast'}</div>
+                <div><strong>Coverage Specification:</strong> ${modelVersion === 'v0-naive' ? 'Heuristic interval (Cold start: ±5% of registered diners)' : '80% target prediction interval (Historical variance band)'}</div>
+                <div><strong>Training Samples:</strong> <strong>${sampleCount}</strong> closed services audited</div>
+                <div><strong>Forecast Generated:</strong> ${generatedAt}</div>
+                <div><strong>Historical Model MAE:</strong> Trailing Error = <strong>${metricSummary.forecastMae > 0 ? `${metricSummary.forecastMae} heads` : 'Insufficient historical audits'}</strong></div>
               </div>
 
-              <!-- Conformal Prediction RangeBar -->
+              <!-- Product Cold-Start Progression Pipeline Info -->
+              <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 14px; font-size: 0.78rem; color: var(--text-secondary);">
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">📈 Cold-Start Model Progression:</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <span class="badge ${sampleCount < 6 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">0–5 meals: v0-naive heuristic</span>
+                  <span class="badge ${sampleCount >= 6 && sampleCount < 20 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">6–20 meals: v1-intent weighted</span>
+                  <span class="badge ${sampleCount >= 20 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">20+ meals: v2 calibrated intervals</span>
+                </div>
+              </div>
+
+              <!-- Target Prediction RangeBar -->
               <div class="range-bar-wrapper" style="margin-bottom: 12px;">
                 <div class="range-bar-header">
-                  <span>Attendance Projection Band (80% Conformal Band)</span>
+                  <span>Attendance Projection Band (${modelVersion === 'v0-naive' ? 'Heuristic Interval' : '80% Target Interval'})</span>
                   <span><strong>${lower}</strong> - <strong>${upper}</strong> attendees</span>
                 </div>
                 <div class="range-track">
@@ -303,7 +327,7 @@ export function renderKitchenView(container) {
             </div>
             <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
               ${(intent.nEat || 0) > 300 
-                ? 'High on-time student participation observed. Conformal interval width reduced by ~25% compared to unprompted history.' 
+                ? 'High on-time student participation observed. Target prediction interval width narrowed by ~25% compared to unprompted history.' 
                 : 'Turnout projection incorporates baseline non-responder participation assumptions.'}
             </p>
           </div>

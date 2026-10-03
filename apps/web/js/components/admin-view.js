@@ -122,7 +122,7 @@ export function renderAdminView(container) {
               🏛️ ${facility.name}
             </h2>
             <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.72rem;">
-              ${isDemo ? 'Demo Evaluator Sandbox • Sample Data' : 'Live Institutional Deployment • Real Records'}
+              ${isDemo ? 'Demo Evaluator Sandbox • Sample Data' : 'Live Mode • Local Operational Records'}
             </span>
           </div>
           <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
@@ -747,10 +747,10 @@ function renderGovernanceTab({ facility, accounts, students, isDemo }) {
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <div>
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">🎯 Conformal Prediction Governance</h3>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">🎯 Prediction Model Governance & Calibration</h3>
             <span style="font-size: 0.82rem; color: var(--text-muted);">Model tier progression and walk-forward verification (Historical calibration)</span>
           </div>
-          <span class="badge badge-eat">80% Nominal Target</span>
+          <span class="badge badge-eat">80% Target Interval</span>
         </div>
 
         <div class="data-table-container">
@@ -923,7 +923,7 @@ function openMonthlyReportModal() {
 
       <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
         <strong>Operational Statement:</strong><br>
-        This operational summary is derived dynamically by MealSense's central MetricEngine from ${isDemo ? 'sample operational records' : 'logged dining records'}. Conformal safety buffers maintained food security with ${report.shortageRate}% shortage rate. Surplus disposition dispatched ${report.donatedFoodKg} kg to community recovery partners.
+        This operational summary is derived dynamically by MealSense's central MetricEngine from ${isDemo ? 'sample operational records' : 'logged dining records'}. Calibrated safety risk buffers maintained food security with ${report.shortageRate}% shortage rate. Surplus disposition dispatched ${report.donatedFoodKg !== null && report.donatedFoodKg !== undefined ? `${report.donatedFoodKg} kg` : '0 kg'} to community recovery partners.
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 14px;">
@@ -1049,10 +1049,20 @@ function openFacilityEditModal() {
 
 // Mini Bar Visualizer for Trend Cards
 function renderMiniBarChart(labels, values, unit, color) {
-  const maxVal = Math.max(...values, 0.01);
+  const numericValues = values.filter(v => typeof v === 'number' && !isNaN(v));
+  const maxVal = numericValues.length > 0 ? Math.max(...numericValues, 0.01) : 1;
   return `
     <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 65px; gap: 6px; padding-top: 14px;">
       ${values.map((v, i) => {
+        if (v === null || typeof v !== 'number' || isNaN(v)) {
+          return `
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;" title="${labels[i]}: Insufficient data">
+              <span style="font-size: 0.68rem; font-weight: 600; color: var(--text-muted);">—</span>
+              <div style="width: 100%; border: 1px dashed var(--border-color); height: 12%; border-radius: 3px; opacity: 0.5;"></div>
+              <span style="font-size: 0.68rem; color: var(--text-muted);">${labels[i]}</span>
+            </div>
+          `;
+        }
         const heightPct = Math.max(12, Math.round((v / maxVal) * 100));
         return `
           <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;" title="${labels[i]}: ${v} ${unit}">

@@ -14,11 +14,13 @@ while holding the **food shortage rate strictly within an explicit guardrail ($<
 
 ## 🎯 Executive Overview & Product Thesis
 
+**MealSense is an end-to-end product prototype for institutional dining operations.** It demonstrates how student meal intent can become an operational demand signal, how kitchens can act on that signal, and how post-meal outcomes can close the measurement loop.
+
 Institutional dining facilities face a classic operational mismatch: kitchen staff must prepare bulk food hours before knowing actual attendance. Preparing too much creates direct financial loss and organic waste; preparing too little risks food shortages and student reprimands.
 
-**MealSense addresses the root cause of overproduction: uncertainty and asymmetric risk.** Rather than treating food waste as a pure machine learning problem, MealSense designs a closed human decision loop:
+**MealSense addresses the root cause of overproduction: uncertainty and asymmetric risk.** Rather than treating food waste as a pure theoretical machine learning problem, MealSense designs a closed human decision loop:
 1. **Lightweight Student Signal**: Students signal intent in 1 tap ($< 3\text{s}$ latency) before the preparation cutoff.
-2. **Conformal Demand Forecast**: Calibrated uncertainty intervals ($80\%$ nominal coverage) replace unassisted gut-feel guesswork.
+2. **Target Demand Forecast**: Calibrated uncertainty intervals ($80\%$ target prediction interval) replace unassisted gut-feel guesswork.
 3. **Decision-First Kitchen UX**: Recommends an exact cooking quantity (`Expected Turnout + Safety Buffer = Servings`) while logging adjustment reasons.
 4. **Post-Meal Waste Auditing**: Simple 60-second outcome capture logs actual attendance, unserved tray waste, plate scrapings, and shortage status.
 5. **Continuous Insights & Defensible Savings**: A centralized Metrics Engine aggregates trends, conversion funnels, and defensible savings against an audited baseline.
@@ -47,8 +49,8 @@ A core product-engineering principle of MealSense is **data-mode credibility**: 
                       Dashboards / Reports
 ```
 
-- **Demo Mode (Seeded Sandbox)**: Preloaded with 7+ days of historical meals, 30+ days of operational trends, a pre-implementation baseline, telemetry event stream, and clearly labeled simulated A/B test benchmarks.
-- **Live Mode (Clean Operational State)**: Clean state for live facility onboarding. Displays authentic empty states rather than fake KPIs or fabricated trends when no data has been entered.
+- **Demo Mode (Seeded Sandbox)**: Preloaded with 35+ days of operational history (90+ meal services across breakfast, lunch, and dinner), pre-implementation baseline, telemetry event stream, and clearly labeled simulated A/B test benchmarks for evaluator walkthroughs.
+- **Live Mode (Clean Operational State)**: Browser-local operational records via Local Storage. Displays authentic empty states rather than fake KPIs or fabricated trends when no data has been entered. Production cloud backend and campus SSO are documented migration targets.
 - **Zero Contamination**: Demo mutations are session-isolated and can be restored at any time via **"Reset Demo"**. Live mode never reads demo data; demo mode never mutates live storage.
 
 ---
@@ -87,7 +89,9 @@ Click **"🚀 Start 60-Second Guided Tour"** on the welcome portal to walk throu
 All metrics are calculated dynamically by `apps/web/js/metrics/metric-engine.js` across active provider records:
 
 ### 1. North Star Metric: Avoidable Waste / Meal
-$$\text{Avoidable Waste / Meal} = \frac{\sum \text{unserved\_waste\_kg}}{\text{actual\_diners\_served}}$$
+$$\text{Avoidable Waste / Meal} = \frac{\sum \text{unserved\_waste\_kg}}{\sum \text{actual\_diners\_served}}$$
+- **Operational Scope**: Focuses strictly on **unserved / avoidable kitchen surplus per diner**. This represents the direct overproduction that MealSense's forecasting and prep targets control.
+- **Secondary Metric (Plate Waste)**: Customer plate scrapings ($\sum \text{plate\_waste\_kg} / \sum \text{actual\_diners}$) are tracked and audited separately in post-meal audits, as customer scrapings reflect portion sizing and recipe preferences rather than kitchen production over-preparation.
 - **Demo Performance**: $0.180\text{ kg/meal}$ (Reduced by **$21.7\%$** from $0.230\text{ kg/meal}$ baseline).
 
 ### 2. Non-Negotiable Guardrail: Shortage Rate

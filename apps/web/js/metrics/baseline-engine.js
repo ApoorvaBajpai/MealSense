@@ -11,7 +11,7 @@ export class BaselineEngine {
    * Compares an active baseline against a current metric summary.
    */
   compare(baseline, currentSummary, facility) {
-    if (!baseline) {
+    if (!baseline || typeof baseline.wastePerMealKg !== 'number' || typeof baseline.overproductionRate !== 'number') {
       return {
         hasBaseline: false,
         message: 'No pre-implementation baseline established yet.'
@@ -27,21 +27,21 @@ export class BaselineEngine {
       };
     }
 
-    const baselineWaste = Number(baseline.wastePerMealKg) || 0.230;
+    const baselineWaste = Number(baseline.wastePerMealKg);
     const currentWaste = Number(currentSummary.wastePerMealKg) || 0;
     const wasteDeltaKg = Number((currentWaste - baselineWaste).toFixed(3));
     const wasteReductionPct = baselineWaste > 0 
       ? Number((((baselineWaste - currentWaste) / baselineWaste) * 100).toFixed(1))
       : 0;
 
-    const baselineOverprod = Number(baseline.overproductionRate) || 6.10;
+    const baselineOverprod = Number(baseline.overproductionRate);
     const currentOverprod = Number(currentSummary.overproductionRate) || 0;
     const overprodDeltaPp = Number((currentOverprod - baselineOverprod).toFixed(1));
     const overproductionReductionPct = baselineOverprod > 0 
       ? Number((((baselineOverprod - currentOverprod) / baselineOverprod) * 100).toFixed(1))
       : 0;
 
-    const baselineMae = Number(baseline.forecastMae) || 8.6;
+    const baselineMae = Number(baseline.forecastMae);
     const currentMae = Number(currentSummary.forecastMae) || 0;
     const maeReductionPct = baselineMae > 0 && currentMae > 0
       ? Number((((baselineMae - currentMae) / baselineMae) * 100).toFixed(1))
@@ -60,6 +60,8 @@ export class BaselineEngine {
     const monthlyMeals = (facility?.registeredCount || 450) * (facility?.mealsPerDay || 3) * 30;
     const monthlyAvoidedPlates = Math.max(0, Math.round(((baselineOverprod - currentOverprod) / 100) * monthlyMeals));
     const estimatedMonthlySavings = Math.round(monthlyAvoidedPlates * costPerServing);
+
+    const baselineShortage = typeof baseline.shortageRate === 'number' ? baseline.shortageRate : 0.0;
 
     return {
       hasBaseline: true,
@@ -86,7 +88,7 @@ export class BaselineEngine {
         improved: maeReductionPct > 0
       },
       shortageRate: {
-        baseline: Number(baseline.shortageRate) || 0.40,
+        baseline: baselineShortage,
         current: currentSummary.shortageRate,
         isGuardrailSatisfied: currentSummary.shortageRate < 0.5
       },

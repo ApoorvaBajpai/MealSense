@@ -37,30 +37,6 @@ class AnalyticsTracker {
     console.debug(`[Telemetry: ${eventName}]`, payload);
   }
 
-  getStudentFunnelMetrics() {
-    return {
-      appOpened: 450,
-      mealViewed: 424,
-      responseStarted: 398,
-      responseSubmitted: 372,
-      onTimeConfirmed: 348,
-      viewToResponseRate: '87.7%',
-      onTimeYield: '77.3%',
-    };
-  }
-
-  getKitchenFunnelMetrics() {
-    return {
-      forecastViewed: 100,
-      recommendationReviewed: 100,
-      decisionRecorded: 96,
-      acceptedWithoutOverride: 84,
-      adjustedWithReason: 12,
-      outcomesLogged: 98,
-      acceptanceRate: '87.5%',
-      complianceRate: '98.0%',
-    };
-  }
 }
 
 export const tracker = new AnalyticsTracker();

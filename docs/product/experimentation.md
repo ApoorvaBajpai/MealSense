@@ -1,16 +1,19 @@
 # MealSense: Experimentation Framework & Product A/B Tests
 
-## 1. Experimentation Philosophy
+## 1. Experimentation Philosophy & Evidence Standards
 
-In MealSense, product decisions and UX refinements are validated through empirical testing rather than intuition. Every experiment has:
+In MealSense, product decisions and UX refinements are validated through structured experimentation rather than intuition. Every experiment specifies:
 - A falsifiable hypothesis connecting user psychology to an operational metric.
 - A randomized, sticky cohort assignment.
 - A primary evaluation metric and a protective guardrail metric.
 - Clear statistical power and minimum detectable effect (MDE) criteria.
 
+> **Credibility & Data Provenance Standard**:  
+> The experiment designs below represent production-ready A/B test specifications. In Demo Mode, associated outcomes are explicitly classified as **Simulated Demo Benchmarks** generated over seeded cohort observations, and are **not** presented as live randomized trial claims. In Live Mode, experiment variant toggles are strictly restricted to maintain randomization integrity.
+
 ---
 
-## 2. Active Product Experiments
+## 2. Product Experiments Registry
 
 ### Experiment EXP-01: Student Value Proposition Framing
 - **Hypothesis**: Framing the meal intent question around collective environmental impact ("Help your mess reduce food waste") will increase student empathy and boost on-time response rates compared to a generic transactional question ("Will you eat lunch?").
@@ -20,11 +23,13 @@ In MealSense, product decisions and UX refinements are validated through empiric
   - **Treatment (Variant B)**: `"Help your mess reduce food waste — will you eat lunch?"` (Impact-oriented framing).
 - **Primary Metric**: On-Time Response Rate (before cutoff deadline).
 - **Guardrail Metric**: Student unsubscribe / opt-out rate ($< 1\%$).
-- **Sample Size & Duration**: $N = 450$ residents over 14 operational days (12,600 meal opportunities).
-- **Empirical Results**:
-  - Variant A (Control): $68.4\%$ on-time response rate.
-  - Variant B (Treatment): **$76.2\%$ on-time response rate** ($+7.8\text{ percentage points}$, $p = 0.003$).
-  - **Decision**: Promoted Variant B to standard production experience.
+- **Sample Size & Target**: $N = 450$ residents over 14 operational days (12,600 meal opportunities).
+- **Simulated Demo Benchmark (Seeded Cohort Evaluation)**:
+  - *Status*: Concluded (Simulated Benchmark)
+  - *Variant A (Control)*: $68.4\%$ on-time response rate.
+  - *Variant B (Treatment)*: **$76.2\%$ on-time response rate** ($+7.8\text{ percentage points}$, $p = 0.003$).
+  - *Decision*: Promoted Variant B to standard experience based on simulated benchmark.
+  - *Note*: These values are seeded demonstration outputs and are not results from a live randomized trial.
 
 ---
 
@@ -36,26 +41,30 @@ In MealSense, product decisions and UX refinements are validated through empiric
   - **Variant B**: `[ 🍽️ Eating ]` / `[ 🚫 Not Eating ]`
 - **Primary Metric**: View-to-Response Conversion Rate ($\text{response\_submitted} / \text{meal\_viewed}$).
 - **Secondary Metric**: Response latency (median seconds from card view to button click).
-- **Empirical Results**:
-  - Variant A: $81.2\%$ conversion, median response latency $4.2\text{ seconds}$.
-  - Variant B: **$86.8\%$ conversion**, median response latency **$2.6\text{ seconds}$** ($p = 0.012$).
-  - **Decision**: Variant B selected as default; supported configurable variant toggle in demo mode.
+- **Simulated Demo Benchmark (Seeded Cohort Evaluation)**:
+  - *Status*: Concluded (Simulated Benchmark)
+  - *Variant A*: $81.2\%$ conversion, median response latency $4.2\text{ seconds}$.
+  - *Variant B*: **$86.8\%$ conversion**, median response latency **$2.6\text{ seconds}$** ($p = 0.012$).
+  - *Decision*: Variant B selected as default; supported configurable variant toggle in demo mode.
+  - *Note*: These values are seeded demonstration outputs and are not results from a live randomized trial.
 
 ---
 
 ### Experiment EXP-03: Personal Impact Feedback vs. 7-Day Retention
-- **Hypothesis**: Providing students with a visible "My Impact" card showing verified kilograms of food saved and on-time consistency increases weekly active response retention by reinforcing intrinsic motivation.
+- **Hypothesis**: Providing students with a visible "My Impact" card showing estimated avoided preparation and on-time consistency increases weekly active response retention by reinforcing intrinsic motivation.
 - **Target Audience**: Newly onboarded residents.
 - **Variants**:
   - **Control (Variant A)**: Standard meal card without personal impact feedback.
-  - **Treatment (Variant B)**: Standard meal card + "My Impact" section (meals responded, on-time %, kg food saved, 4-week trend).
+  - **Treatment (Variant B)**: Standard meal card + "My Impact" section (meals responded, on-time %, estimated avoided prep kg, 4-week trend).
 - **Primary Metric**: Week-2 Response Retention Rate (% of students responding $\ge 5$ times in their second week).
-- **Guardrail Metric**: Kitchen forecast bias (ensures impact feedback doesn't cause students to falsely declare "skip" to artificially inflate their "saved kg").
-- **Empirical Results**:
-  - Control (Variant A): $58.5\%$ Week-2 response retention.
-  - Treatment (Variant B): **$74.8\%$ Week-2 response retention** ($+16.3\text{ percentage points}$, $p < 0.001$).
-  - Forecast Bias Check: Negligible change ($-0.4$ vs $-0.2$), confirming no adverse gaming.
-  - **Decision**: Integrated "My Impact" dashboard as a core permanent feature of the student view.
+- **Guardrail Metric**: Kitchen forecast bias (ensures impact feedback doesn't cause students to falsely declare "skip" to artificially inflate their signal score).
+- **Simulated Demo Benchmark (Seeded Cohort Evaluation)**:
+  - *Status*: Concluded (Simulated Benchmark)
+  - *Control (Variant A)*: $58.5\%$ Week-2 response retention.
+  - *Treatment (Variant B)*: **$74.8\%$ Week-2 response retention** ($+16.3\text{ percentage points}$, $p < 0.001$).
+  - *Forecast Bias Check*: Negligible change ($-0.4$ vs $-0.2$), confirming no adverse gaming.
+  - *Decision*: Integrated "My Impact" dashboard as a core permanent feature of the student view.
+  - *Note*: These values are seeded demonstration outputs and are not results from a live randomized trial.
 
 ---
 
@@ -66,7 +75,7 @@ CREATE TABLE experiments (
     id VARCHAR(50) PRIMARY KEY, -- e.g. 'exp-01-value-prop'
     name VARCHAR(150) NOT NULL,
     description TEXT NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'active', -- 'active', 'concluded', 'draft'
+    status VARCHAR(20) NOT NULL DEFAULT 'active', -- 'draft', 'ready', 'running', 'concluded'
     start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ,
     primary_metric VARCHAR(100) NOT NULL,
@@ -94,7 +103,7 @@ Every event tracked in `apps/web/js/analytics.js` automatically carries active e
 {
   "event_name": "response_submitted",
   "user_id": "u-student-001",
-  "facility_id": "fac-tagore",
+  "facility_id": "fac-ramanujan",
   "meal_id": "demo-today-lunch",
   "properties": {
     "response": "eat",

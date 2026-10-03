@@ -1,11 +1,9 @@
 /**
- * MealSense Production Authentication Service
+ * Prototype Authentication Service
+ * Local browser authentication (localStorage + SHA-256) for portfolio evaluation.
  * Supports:
- * 1. Three dedicated first-time evaluation accounts:
- *    - student_testid (Resident Student with rich dummy data)
- *    - staff_testid (Kitchen Chef with real-time planning data)
- *    - admin_testid (Warden/Admin with audit & accuracy data)
- * 2. Real user registrations: strictly clean slate without dummy data.
+ * 1. Dedicated first-time evaluation accounts for evaluator walkthroughs.
+ * 2. Real user registrations: strictly clean slate without dummy data in Live Mode.
  */
 
 const STORAGE_USERS_KEY = 'mealsense_accounts_v1';

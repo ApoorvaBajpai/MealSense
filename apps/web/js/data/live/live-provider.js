@@ -43,6 +43,29 @@ export class LiveDataProvider {
     this.auditLogs = this._load(LIVE_AUDIT_KEY, []);
   }
 
+  clearAll() {
+    this.meals = [];
+    this.intentCounts = {};
+    this.predictions = {};
+    this.kitchenDecisions = {};
+    this.outcomes = {};
+    this.events = [];
+    this.auditLogs = [];
+    this.baseline = null;
+    [
+      LIVE_MEALS_KEY,
+      LIVE_INTENT_KEY,
+      LIVE_OUTCOMES_KEY,
+      LIVE_DECISIONS_KEY,
+      LIVE_PREDICTIONS_KEY,
+      LIVE_EVENTS_KEY,
+      LIVE_AUDIT_KEY,
+      LIVE_BASELINE_KEY
+    ].forEach(k => {
+      try { localStorage.removeItem(k); } catch (e) {}
+    });
+  }
+
   _load(key, fallback) {
     try {
       const stored = localStorage.getItem(key);

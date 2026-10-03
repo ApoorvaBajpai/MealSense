@@ -48,9 +48,10 @@ export class MetricEngine {
     const totalActualAttendance = outcomesList.reduce((acc, o) => acc + (Number(o.actualCount) || 0), 0);
     const totalCookedServings = outcomesList.reduce((acc, o) => acc + (Number(o.preparedServings) || 0), 0);
 
-    // 2. Waste Aggregation (Distinguish unserved tray waste from plate scrapings)
+    // 2. Waste Aggregation (Distinguish unserved tray waste from plate scrapings and donations)
     let unservedWasteKg = 0;
     let plateWasteKg = 0;
+    let totalDonatedKg = 0;
 
     outcomesList.forEach(o => {
       // Direct unserved/uneaten if present
@@ -59,6 +60,9 @@ export class MetricEngine {
       }
       if (typeof o.uneatenKg === 'number') {
         plateWasteKg += o.uneatenKg;
+      }
+      if (typeof o.donatedKg === 'number') {
+        totalDonatedKg += o.donatedKg;
       }
 
       // Or parse from wasteRecords array
@@ -70,6 +74,8 @@ export class MetricEngine {
             } else if (r.wasteType === 'uneaten' && typeof o.uneatenKg !== 'number') {
               plateWasteKg += Number(r.quantityKg || 0);
             }
+          } else if (typeof o.donatedKg !== 'number') {
+            totalDonatedKg += Number(r.quantityKg || 0);
           }
         });
       }
@@ -155,6 +161,7 @@ export class MetricEngine {
       totalWasteKg: Number(totalWasteKg.toFixed(2)),
       unservedWasteKg: Number(unservedWasteKg.toFixed(2)),
       plateWasteKg: Number(plateWasteKg.toFixed(2)),
+      totalDonatedKg: Number(totalDonatedKg.toFixed(1)),
       overproductionRate,
       shortageRate,
       shortagesCount,

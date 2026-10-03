@@ -1,6 +1,11 @@
 /**
  * MealSense Dynamic Trend Engine
  * Replaces hardcoded static trend arrays with dynamic aggregation over stored meal & outcome records.
+ * 
+ * Strict Credibility Guarantees:
+ * - Never injects fake numeric fallbacks (e.g. 7.0 MAE or 75.0% response) for missing data.
+ * - Missing data points return null (rendered as "—" or "Insufficient data").
+ * - 90d trend aggregates authentic monthly calendar buckets; never manufactures a midpoint.
  */
 
 export class TrendEngine {
@@ -8,10 +13,10 @@ export class TrendEngine {
    * Generates time-series data for a given metric and timeframe across closed meals.
    */
   getSeries(metricKey, timeframe = '30d', provider) {
-    const meals = provider.getMeals();
-    const outcomes = provider.getAllOutcomes();
-    const predictions = provider.getAllPredictions();
-    const intentCounts = provider.getAllIntentCounts();
+    const meals = provider.getMeals() || [];
+    const outcomes = provider.getAllOutcomes() || {};
+    const predictions = provider.getAllPredictions() || {};
+    const intentCounts = provider.getAllIntentCounts() || {};
     const facility = provider.getFacility();
     const baseline = provider.getBaseline();
 
@@ -20,10 +25,10 @@ export class TrendEngine {
       .filter(m => m.status === 'closed' && outcomes[m.id])
       .sort((a, b) => new Date(a.mealDate) - new Date(b.mealDate));
 
-    if (closedMeals.length < 2 && provider.mode === 'live') {
+    if (closedMeals.length === 0) {
       return {
-        insufficientData: true,
-        message: 'Not enough operational meal records yet to display trend curves.',
+        hasData: false,
+        statusLabel: 'No closed meals yet',
         labels: [],
         values: [],
         unit: this._getMetricUnit(metricKey)
@@ -41,128 +46,216 @@ export class TrendEngine {
   }
 
   _aggregate7DayDaily(meals, outcomes, predictions, intentCounts, facility, metricKey) {
-    // Take up to last 7 meals
-    const slice = meals.slice(-7);
+    // Take the last 7 calendar days up to the most recent meal date
+    const lastMeal = meals[meals.length - 1];
+    const refDate = lastMeal ? new Date(lastMeal.mealDate + 'T00:00:00') : new Date();
+
     const labels = [];
     const values = [];
 
-    slice.forEach(m => {
-      const out = outcomes[m.id];
-      const d = new Date(m.mealDate + 'T00:00:00');
-      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+    for (let i = 6; i >= 0; i--) {
+      const targetDate = new Date(refDate.getTime() - i * 86400000);
+      const dateStr = targetDate.toISOString().split('T')[0];
+      const dayName = targetDate.toLocaleDateString('en-US', { weekday: 'short' });
       labels.push(dayName);
 
-      const val = this._extractMealMetricValue(m, out, predictions[m.id], intentCounts[m.id], facility, metricKey);
-      values.push(val);
-    });
+      // Find closed meals on this specific date
+      const dayMeals = meals.filter(m => m.mealDate === dateStr);
+      if (dayMeals.length > 0) {
+        const metricVals = dayMeals
+          .map(m => this._extractMealMetricValue(m, outcomes[m.id], predictions[m.id], intentCounts[m.id], facility, metricKey))
+          .filter(v => v !== null);
+
+        if (metricVals.length > 0) {
+          const avg = metricVals.reduce((a, b) => a + b, 0) / metricVals.length;
+          values.push(Number(avg.toFixed(2)));
+        } else {
+          values.push(null);
+        }
+      } else {
+        values.push(null); // Insufficient data for this day
+      }
+    }
+
+    const validVals = values.filter(v => v !== null);
+    const hasData = validVals.length > 0;
 
     return {
-      insufficientData: false,
+      hasData,
       timeframe: '7d',
       labels,
       values,
       unit: this._getMetricUnit(metricKey),
-      label: this._getMetricLabel(metricKey)
+      label: this._getMetricLabel(metricKey),
+      statusLabel: hasData ? (validVals.length >= 2 && validVals[validVals.length - 1] < validVals[0] ? '↓ Improving' : 'Observed trend') : 'Insufficient data'
     };
   }
 
   _aggregate30DayWeekly(meals, outcomes, predictions, intentCounts, facility, baseline, metricKey) {
-    if (meals.length === 0) {
-      return { insufficientData: true, labels: [], values: [] };
-    }
+    const lastMeal = meals[meals.length - 1];
+    const refDate = lastMeal ? new Date(lastMeal.mealDate + 'T00:00:00') : new Date();
 
-    // Partition meals into 4 sequential blocks (Weeks 1 to 4)
-    const chunkSize = Math.max(1, Math.ceil(meals.length / 4));
-    const labels = ['W1 (Early)', 'W2', 'W3', 'W4 (Recent)'];
+    const labels = ['W-3', 'W-2', 'W-1', 'Current Wk'];
     const values = [];
 
-    for (let i = 0; i < 4; i++) {
-      const chunk = meals.slice(i * chunkSize, (i + 1) * chunkSize);
-      if (chunk.length > 0) {
-        const chunkVals = chunk.map(m => 
-          this._extractMealMetricValue(m, outcomes[m.id], predictions[m.id], intentCounts[m.id], facility, metricKey)
-        );
-        const avg = chunkVals.reduce((a, b) => a + b, 0) / chunkVals.length;
-        values.push(Number(avg.toFixed(2)));
+    // 4 successive 7-day windows spanning the past 28 days
+    for (let w = 3; w >= 0; w--) {
+      const windowEnd = new Date(refDate.getTime() - (w * 7 * 86400000) + 86400000);
+      const windowStart = new Date(refDate.getTime() - ((w + 1) * 7 * 86400000) + 86400000);
+
+      const chunkMeals = meals.filter(m => {
+        const d = new Date(m.mealDate + 'T00:00:00');
+        return d >= windowStart && d < windowEnd;
+      });
+
+      if (chunkMeals.length > 0) {
+        const metricVals = chunkMeals
+          .map(m => this._extractMealMetricValue(m, outcomes[m.id], predictions[m.id], intentCounts[m.id], facility, metricKey))
+          .filter(v => v !== null);
+
+        if (metricVals.length > 0) {
+          const avg = metricVals.reduce((a, b) => a + b, 0) / metricVals.length;
+          values.push(Number(avg.toFixed(2)));
+        } else {
+          values.push(null);
+        }
       } else {
-        // Fallback to trailing value
-        values.push(values[values.length - 1] || 0);
+        values.push(null); // No meals in this weekly window
       }
     }
 
+    const validVals = values.filter(v => v !== null);
+    const hasData = validVals.length > 0;
+
     return {
-      insufficientData: false,
+      hasData,
       timeframe: '30d',
       labels,
       values,
       unit: this._getMetricUnit(metricKey),
-      label: this._getMetricLabel(metricKey)
+      label: this._getMetricLabel(metricKey),
+      statusLabel: hasData ? (validVals.length >= 2 && validVals[validVals.length - 1] < validVals[0] ? '↓ Declining' : 'Observed trend') : 'Insufficient data'
     };
   }
 
   _aggregate90DayMonthly(meals, outcomes, predictions, intentCounts, facility, baseline, metricKey) {
-    // 3 Buckets: Baseline Reference Month, Mid Pilot, Current Month
-    const labels = ['Month -2 (Baseline)', 'Month -1 (Mid Pilot)', 'Current Month'];
-    const baselineVal = this._getBaselineValue(baseline, metricKey);
-    
-    // Average current meals
-    const currentVals = meals.map(m => 
-      this._extractMealMetricValue(m, outcomes[m.id], predictions[m.id], intentCounts[m.id], facility, metricKey)
-    );
-    const currentAvg = currentVals.length > 0 
-      ? Number((currentVals.reduce((a, b) => a + b, 0) / currentVals.length).toFixed(2))
-      : baselineVal;
+    // Form 3 authentic calendar month buckets (e.g. Month -2, Month -1, Current Month)
+    const lastMeal = meals[meals.length - 1];
+    const refDate = lastMeal ? new Date(lastMeal.mealDate + 'T00:00:00') : new Date();
 
-    // Mid point
-    const midVal = Number(((baselineVal + currentAvg) / 2).toFixed(2));
+    const currentYear = refDate.getFullYear();
+    const currentMonth = refDate.getMonth();
+
+    const monthBuckets = [
+      new Date(currentYear, currentMonth - 2, 1),
+      new Date(currentYear, currentMonth - 1, 1),
+      new Date(currentYear, currentMonth, 1)
+    ];
+
+    const labels = monthBuckets.map(b => b.toLocaleDateString('en-US', { month: 'short' }));
+    const values = [];
+
+    monthBuckets.forEach((bucketStart, idx) => {
+      const bucketEnd = new Date(bucketStart.getFullYear(), bucketStart.getMonth() + 1, 1);
+
+      const bucketMeals = meals.filter(m => {
+        const d = new Date(m.mealDate + 'T00:00:00');
+        return d >= bucketStart && d < bucketEnd;
+      });
+
+      if (bucketMeals.length > 0) {
+        const metricVals = bucketMeals
+          .map(m => this._extractMealMetricValue(m, outcomes[m.id], predictions[m.id], intentCounts[m.id], facility, metricKey))
+          .filter(v => v !== null);
+
+        if (metricVals.length > 0) {
+          const avg = metricVals.reduce((a, b) => a + b, 0) / metricVals.length;
+          values.push(Number(avg.toFixed(2)));
+        } else {
+          values.push(null);
+        }
+      } else {
+        // If idx === 0 (Month -2) and it matches the pre-implementation baseline period,
+        // use the documented baseline reference; otherwise return null (NEVER a synthetic midpoint!)
+        if (idx === 0 && baseline && this._hasBaselineValue(baseline, metricKey)) {
+          values.push(this._getBaselineValue(baseline, metricKey));
+          labels[0] = `${labels[0]} (Base)`;
+        } else {
+          values.push(null); // Honest missing data
+        }
+      }
+    });
+
+    const validVals = values.filter(v => v !== null);
+    const hasData = validVals.length > 0;
 
     return {
-      insufficientData: false,
+      hasData,
       timeframe: '90d',
       labels,
-      values: [baselineVal, midVal, currentAvg],
+      values,
       unit: this._getMetricUnit(metricKey),
-      label: this._getMetricLabel(metricKey)
+      label: this._getMetricLabel(metricKey),
+      statusLabel: hasData ? 'Authentic monthly records' : 'Insufficient data'
     };
   }
 
   _extractMealMetricValue(meal, outcome, prediction, intent, facility, metricKey) {
-    if (!outcome) return 0;
-    const actual = Number(outcome.actualCount) || 1;
-    const prepared = Number(outcome.preparedServings) || 1;
+    if (!outcome) return null;
+    const actual = Number(outcome.actualCount);
+    const prepared = Number(outcome.preparedServings);
 
     switch (metricKey) {
       case 'wastePerMeal':
+        if (!actual || actual <= 0) return null;
         return Number((Number(outcome.unservedKg || 0) / actual).toFixed(3));
+
       case 'overproduction':
+        if (!prepared || prepared <= 0) return null;
         return Number((Math.max(0, prepared - actual) / prepared * 100).toFixed(1));
+
       case 'forecastMae':
-        if (prediction && prediction.prediction) {
+        if (prediction && typeof prediction.prediction === 'number' && actual > 0) {
           return Number(Math.abs(prediction.prediction - actual).toFixed(1));
         }
-        return 7.0;
+        return null; // Return null when forecast record is absent (no fake fallbacks!)
+
       case 'responseRate':
-        if (intent) {
-          const registered = meal.registeredSnapshot || facility.registeredCount || 450;
+        if (intent && (typeof intent.nEat === 'number' || typeof intent.nSkip === 'number')) {
+          const registered = meal.registeredSnapshot || facility?.registeredCount || 450;
           return Number((((intent.nEat || 0) + (intent.nSkip || 0)) / registered * 100).toFixed(1));
         }
-        return 75.0;
+        return null; // Return null when intent telemetry is absent (no fake fallbacks!)
+
       case 'shortageRate':
         return outcome.ranShort ? 100.0 : 0.0;
+
       default:
-        return 0;
+        return null;
+    }
+  }
+
+  _hasBaselineValue(baseline, metricKey) {
+    if (!baseline) return false;
+    switch (metricKey) {
+      case 'wastePerMeal': return typeof baseline.wastePerMealKg === 'number';
+      case 'overproduction': return typeof baseline.overproductionRate === 'number';
+      case 'forecastMae': return typeof baseline.forecastMae === 'number';
+      case 'responseRate': return typeof baseline.onTimeResponseRate === 'number';
+      case 'shortageRate': return typeof baseline.shortageRate === 'number';
+      default: return false;
     }
   }
 
   _getBaselineValue(baseline, metricKey) {
-    if (!baseline) return 0;
+    if (!baseline) return null;
     switch (metricKey) {
-      case 'wastePerMeal': return Number(baseline.wastePerMealKg) || 0.230;
-      case 'overproduction': return Number(baseline.overproductionRate) || 6.10;
-      case 'forecastMae': return Number(baseline.forecastMae) || 8.60;
-      case 'responseRate': return Number(baseline.onTimeResponseRate) || 24.5;
-      case 'shortageRate': return Number(baseline.shortageRate) || 0.40;
-      default: return 0;
+      case 'wastePerMeal': return baseline.wastePerMealKg ?? null;
+      case 'overproduction': return baseline.overproductionRate ?? null;
+      case 'forecastMae': return baseline.forecastMae ?? null;
+      case 'responseRate': return baseline.onTimeResponseRate ?? null;
+      case 'shortageRate': return baseline.shortageRate ?? null;
+      default: return null;
     }
   }
 

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MealSense Automated Test Runner</title>
+  <link rel="stylesheet" href="./styles/main.css">
+  <style>
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      padding: 32px 20px;
+      margin: 0;
+    }
+    .test-container {
+      max-width: 840px;
+      margin: 0 auto;
+    }
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+    .test-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .test-card.passed {
+      border-left: 4px solid var(--color-eat);
+    }
+    .test-card.failed {
+      border-left: 4px solid var(--color-danger);
+      background: rgba(179, 57, 39, 0.04);
+    }
+    .status-badge {
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+    .status-badge.passed {
+      background: var(--color-eat-bg);
+      color: var(--color-eat);
+      border: 1px solid var(--color-eat-border);
+    }
+    .status-badge.failed {
+      background: var(--color-skip-bg);
+      color: var(--color-danger);
+      border: 1px solid var(--color-danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <div class="test-header">
+      <div>
+        <h1 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 4px 0;">
+          🧪 MealSense Automated Test Runner
+        </h1>
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+          Unit & Closed-Loop Integration Test Suite for Portfolio Evaluation
+        </div>
+      </div>
+      <div>
+        <button id="btn-rerun" class="btn btn-primary btn-sm">▶ Re-run All Tests</button>
+        <a href="./index.html" class="btn btn-secondary btn-sm" style="text-decoration: none; margin-left: 6px;">App Home</a>
+      </div>
+    </div>
+
+    <!-- Summary Banner -->
+    <div id="summary-banner" class="card" style="margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center; padding: 16px;">
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">TOTAL TESTS</div>
+        <div id="stat-total" style="font-size: 1.8rem; font-weight: 800;">-</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: var(--color-eat); font-weight: 700;">PASSED</div>
+        <div id="stat-passed" style="font-size: 1.8rem; font-weight: 800; color: var(--color-eat);">-</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: var(--color-danger); font-weight: 700;">FAILED</div>
+        <div id="stat-failed" style="font-size: 1.8rem; font-weight: 800; color: var(--color-danger);">-</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">STATUS</div>
+        <div id="stat-status" style="font-size: 1.2rem; font-weight: 800; margin-top: 6px;">Running...</div>
+      </div>
+    </div>
+
+    <!-- Test List -->
+    <div id="test-list"></div>
+  </div>
+
+  <script type="module">
+    import { runAllTests } from './js/tests/engine.test.js';
+
+    async function execute() {
+      const listEl = document.getElementById('test-list');
+      listEl.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Running test suite...</div>';
+
+      try {
+        const report = await runAllTests();
+        window.__TEST_RESULTS__ = report;
+
+        document.getElementById('stat-total').textContent = report.total;
+        document.getElementById('stat-passed').textContent = report.passed;
+        document.getElementById('stat-failed').textContent = report.failed;
+        
+        const statusEl = document.getElementById('stat-status');
+        if (report.failed === 0) {
+          statusEl.textContent = '100% PASSED ✓';
+          statusEl.style.color = 'var(--color-eat)';
+        } else {
+          statusEl.textContent = `${report.failed} FAILED ✗`;
+          statusEl.style.color = 'var(--color-danger)';
+        }
+
+        listEl.innerHTML = report.results.map(r => `
+          <div class="test-card ${r.status.toLowerCase()}">
+            <div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 2px;">
+                ${r.name}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                Execution time: ${r.duration} ${r.error ? `• <span style="color: var(--color-danger);">${r.error}</span>` : ''}
+              </div>
+            </div>
+            <span class="status-badge ${r.status.toLowerCase()}">${r.status}</span>
+          </div>
+        `).join('');
+
+        console.log('[MealSense Tests Complete]', report);
+      } catch (err) {
+        listEl.innerHTML = `<div class="card" style="color: var(--color-danger);">Fatal Runner Error: ${err.message}</div>`;
+        console.error(err);
+      }
+    }
+
+    document.getElementById('btn-rerun').addEventListener('click', execute);
+    execute();
+  </script>
+</body>
+</html>

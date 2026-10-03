@@ -146,7 +146,7 @@ export function renderStudentView(container) {
         <button id="btn-bulk-skip-tomorrow" class="pill-btn">⚡ Skip All Tomorrow</button>
         <button id="btn-open-away-modal" class="pill-btn">✈️ Away Mode</button>
         <button id="btn-scroll-to-impact" class="pill-btn" style="background: var(--color-eat-bg); color: var(--color-eat); border-color: var(--color-eat-border);">
-          🏆 My Impact (${foodAvoidedKg} kg Saved)
+          🏆 My Impact (${foodAvoidedKg} kg Avoided Prep)
         </button>
       </div>
 
@@ -186,7 +186,8 @@ export function renderStudentView(container) {
           </div>
           <div style="background: var(--color-eat-bg); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-eat-border);">
             <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">${foodAvoidedKg} kg</div>
-            <div style="font-size: 0.78rem; color: var(--color-eat); font-weight: 700; text-transform: uppercase;">Food Avoided*</div>
+            <div style="font-size: 0.74rem; color: var(--color-eat); font-weight: 700; text-transform: uppercase;">Avoided Prep*</div>
+            <div style="font-size: 0.66rem; color: var(--color-eat); opacity: 0.85;">Demand Signal Contribution</div>
           </div>
         </div>
 
@@ -219,7 +220,7 @@ export function renderStudentView(container) {
         </div>
 
         <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
-          *<em>Methodology Notice:</em> Food avoided estimate is calculated as 0.350 kg/serving avoided whenever an on-time 'Skip' response allowed the kitchen to adjust batch preparation. Only advance notice prevents unnecessary cauldron cooking.
+          *<em>Methodology Notice:</em> Estimated avoided preparation based on student demand signal contribution (0.350 kg/portion avoided whenever an advance skip allowed the kitchen to downsize cook batches prior to cauldron preparation).
         </div>
       </div>
     </div>
