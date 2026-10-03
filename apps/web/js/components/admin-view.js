@@ -462,14 +462,16 @@ function renderInsightsTab({ insights, isDemo }) {
             </div>
           `).join('')}
 
-          <!-- Section 9 / 16.1: Small Group Privacy Suppression Rule Demonstration -->
+          <!-- Small Group Privacy Suppression Rule Demonstration -->
           <div style="background: rgba(184, 93, 56, 0.04); border-radius: var(--radius-md); padding: 14px 16px; border: 1px dashed var(--brand-accent);">
-            <div style="font-size: 0.84rem; font-weight: 800; color: var(--brand-primary); margin-bottom: 4px;">
-              🔒 Small-Group Privacy Suppression Rule
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.84rem; font-weight: 800; color: var(--brand-primary);">
+                🔒 Small-Group Privacy Suppression
+              </span>
+              <span class="badge badge-eat" style="font-size: 0.68rem;">Status: Active</span>
             </div>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
-              <em>Cohort Example (Block C, Wing 4):</em> <strong>[ Insufficient data to display this breakdown — 3 responses ]</strong>.<br>
-              Subgroup breakdowns with fewer than 5 active responses are suppressed across all aggregate dashboards to prevent resident re-identification.
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+              <strong>Small-group suppression is active.</strong> Subgroup breakdowns with fewer than 5 active responses are automatically suppressed across aggregate dashboards to eliminate re-identification risk.
             </p>
           </div>
         </div>
@@ -1030,7 +1032,7 @@ function openMethodologyModal() {
     <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
       <p><strong>Defensible Savings Methodology vs Unsubstantiated Claims:</strong></p>
       <p>
-        In institutional dining, ungrounded financial claims fail administrative scrutiny. MealSense uses an audited 30-day pre-implementation baseline period to measure true operational change:
+        In institutional dining, ungrounded financial claims fail administrative scrutiny. MealSense uses a defined 30-day pre-implementation baseline period to measure true operational change:
       </p>
       <ul style="margin-left: 20px; margin-top: 6px;">
         <li><strong>Baseline Reference Period:</strong> August 1–31, 2026 (Unassisted gut-feel cooking).</li>
