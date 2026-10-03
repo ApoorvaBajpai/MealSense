@@ -1,13 +1,6 @@
 /**
- * MealSense Authentication View Component: PM & Technical Specification V2.0
- * 
- * Features:
- * - Clear distinction: DEMO MODE (seeded experience) vs LIVE MODE (clean operational state)
- * - 60-Second Guided PM Evaluator Tour launcher
- * - Dedicated demo identities for Student, Kitchen Staff, and Administrator
- * - Deep link evaluator guide (?mode=demo&role=student|kitchen|admin or ?tour=true)
- * - Honestly labeled "Prototype Authentication (Local Storage & SHA-256)"
- * - Clean slate registration for authentic live deployment testing
+ * MealSense Authentication View Component
+ * Dark-First Glassmorphism Edition — Redesigned for premium UX
  */
 
 import { authService } from '../auth.js';
@@ -21,132 +14,117 @@ export function renderAuthView(container) {
 
   function update() {
     container.innerHTML = `
-      <div class="auth-container" style="max-width: 560px; margin: 0 auto; padding: 20px 14px;">
-        <!-- Brand Header -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 20px; text-align: center;">
-          <div class="brand-icon" style="width: 56px; height: 56px; font-size: 2rem;">🍽️</div>
-          <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-top: 4px; letter-spacing: -0.02em;">
-            MealSense
-          </h1>
-          <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 440px; line-height: 1.4; margin: 0;">
-            Institutional Dining & Food-Waste Prevention Platform
-          </p>
-          <div style="font-size: 0.78rem; font-weight: 600; color: var(--brand-primary); margin-top: 2px;">
-            Student Intent → Demand Forecast → Kitchen Decision → Waste Audit → Continuous Insights
-          </div>
+      <div class="auth-container">
+
+        <!-- Brand Hero -->
+        <div class="auth-brand-header">
+          <div class="auth-brand-icon">🍽️</div>
+          <h1 class="auth-heading">MealSense</h1>
+          <p class="auth-tagline">Institutional dining & food-waste prevention — driven by student intent signals.</p>
+          <div class="auth-flow-line">Intent → Forecast → Kitchen Decision → Waste Audit → Insight</div>
         </div>
 
-        <!-- Section 3.1 & 17.1: Guided 60-Second PM Evaluator Tour CTA Card -->
-        <div class="card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(184, 93, 56, 0.08) 100%); border: 2px solid var(--brand-accent); padding: 18px; margin-bottom: 20px; text-align: center;">
-          <div style="font-size: 0.74rem; font-weight: 800; text-transform: uppercase; color: var(--brand-primary); letter-spacing: 0.05em; margin-bottom: 4px;">
-            ⭐ Product Management Evaluator Experience
+        <!-- Guided Tour CTA -->
+        <div class="auth-card auth-tour-card">
+          <div class="tour-eyebrow">
+            <span class="tour-eyebrow-badge">
+              <span class="dot"></span>
+              PM Evaluator Experience
+            </span>
           </div>
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
+          <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.02em;margin-bottom:6px;">
             60-Second Closed-Loop Guided Tour
           </h3>
-          <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 14px auto; line-height: 1.4;">
-            Experience the complete 5-stage product loop across Student, Kitchen, and Admin perspectives with guided walkthrough prompts.
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">
+            Walk through the complete 5-stage product loop across Student, Kitchen, and Admin perspectives — guided at every step.
           </p>
-          <button id="btn-start-guided-tour" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem; font-weight: 700;">
-            🚀 Start 60-Second Guided Tour
+          <button id="btn-start-guided-tour" class="btn btn-primary btn-lg" style="width:100%;">
+            ▶&ensp;Start Guided Tour
           </button>
         </div>
 
-        <!-- Section 3: First-Class Demo Mode Entry Hub -->
-        <div class="card" style="margin-bottom: 20px; padding: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">
-              ✨ First-Class Demo Mode (Seeded Sandbox)
-            </div>
-            <span class="badge badge-eat" style="font-size: 0.68rem;">Ready-to-Explore</span>
+        <!-- Demo Mode Hub -->
+        <div class="auth-card" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;">
+            <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;">
+              Sandbox — Seeded Demo
+            </span>
+            <span class="badge badge-eat">Ready to Explore</span>
           </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
-            Explore with preloaded operational data: 7+ days of meals, baseline comparison, telemetry events, and simulated A/B tests without manual setup.
-          </p>
 
-          <button id="btn-explore-demo-direct" type="button" class="btn btn-primary" style="width: 100%; padding: 11px; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
-            ✨ Explore Demo Mode
+          <button id="btn-explore-demo-direct" type="button" class="btn btn-primary" style="width:100%;margin-bottom:14px;height:46px;">
+            ✦&ensp;Explore Demo Mode
           </button>
 
-          <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.04em;">
-            Or choose a specific demo perspective:
-          </div>
+          <div class="demo-mode-section-label">Or enter as a specific role:</div>
 
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <!-- Student Demo Card -->
-            <button type="button" class="btn-demo-quick" data-demo-id="student_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.5rem;">🎓</span>
-                <div>
-                  <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Student</div>
-                  <div style="font-size: 0.76rem; color: var(--text-muted);">Aarav Sharma • One-tap intent & data-derived My Impact</div>
-                </div>
-              </div>
-              <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
-            </button>
+          <!-- Student -->
+          <button type="button" class="demo-role-btn" data-demo-id="student_testid">
+            <div class="demo-role-icon student-icon">🎓</div>
+            <div class="demo-role-body">
+              <div class="demo-role-name">Student — Aarav Sharma</div>
+              <div class="demo-role-desc">One-tap intent, My Impact metrics, away mode</div>
+            </div>
+            <span class="demo-role-arrow">→</span>
+          </button>
 
-            <!-- Kitchen Demo Card -->
-            <button type="button" class="btn-demo-quick" data-demo-id="staff_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.5rem;">👨‍🍳</span>
-                <div>
-                  <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Kitchen Staff</div>
-                  <div style="font-size: 0.76rem; color: var(--text-muted);">Chef Rajesh • Service forecast snapshot, overrides & outcome loop</div>
-                </div>
-              </div>
-              <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
-            </button>
+          <!-- Kitchen -->
+          <button type="button" class="demo-role-btn" data-demo-id="staff_testid">
+            <div class="demo-role-icon kitchen-icon">👨‍🍳</div>
+            <div class="demo-role-body">
+              <div class="demo-role-name">Kitchen — Chef Rajesh</div>
+              <div class="demo-role-desc">Forecast snapshot, prep decision, outcome loop</div>
+            </div>
+            <span class="demo-role-arrow">→</span>
+          </button>
 
-            <!-- Admin Demo Card -->
-            <button type="button" class="btn-demo-quick" data-demo-id="admin_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.5rem;">🏛️</span>
-                <div>
-                  <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Administrator</div>
-                  <div style="font-size: 0.76rem; color: var(--text-muted);">Dr. V. K. Verma • Executive metrics, trends, funnels & reports</div>
-                </div>
-              </div>
-              <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
-            </button>
-          </div>
+          <!-- Admin -->
+          <button type="button" class="demo-role-btn" data-demo-id="admin_testid">
+            <div class="demo-role-icon admin-icon">🏛️</div>
+            <div class="demo-role-body">
+              <div class="demo-role-name">Admin — Dr. V. K. Verma</div>
+              <div class="demo-role-desc">Executive KPIs, trends, funnels, audit reports</div>
+            </div>
+            <span class="demo-role-arrow">→</span>
+          </button>
 
           <!-- Deep link hint -->
-          <div style="background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 14px; border: 1px solid var(--border-subtle); font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
-            🔗 <strong>Evaluator Deep Links:</strong> Use <code>?mode=demo&role=student</code>, <code>?mode=demo&role=kitchen</code>, <code>?mode=demo&role=admin</code>, or <code>?tour=true</code> for direct role access.
+          <div class="info-box" style="margin-top:12px;">
+            🔗 <strong>Evaluator deep links:</strong>
+            <code style="font-size:0.72rem;background:var(--bg-surface-3);padding:1px 5px;border-radius:3px;">?mode=demo&role=student</code>,
+            <code style="font-size:0.72rem;background:var(--bg-surface-3);padding:1px 5px;border-radius:3px;">?mode=demo&role=kitchen</code>,
+            <code style="font-size:0.72rem;background:var(--bg-surface-3);padding:1px 5px;border-radius:3px;">?tour=true</code>
           </div>
         </div>
 
-        <!-- Section 16: Authentication Card (Prototype Authentication) -->
+        <!-- Auth Card (Login / Register) -->
         <div class="auth-card">
-          <div style="margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;">
                 Prototype Authentication
               </span>
-              <span class="badge" style="font-size: 0.66rem; background: var(--bg-secondary);">Local SHA-256</span>
+              <span class="badge badge-skip" style="font-size:0.63rem;">Local SHA-256</span>
             </div>
-            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
-              Client-side authentication prototype. In production, identity is managed via OAuth/SAML SSO with server-side JWT and Row-Level Security (RLS).
+            <div style="font-size:0.73rem;color:var(--text-muted);line-height:1.45;">
+              Client-side prototype. Production uses OAuth/SAML SSO with server-side JWT & Row-Level Security.
             </div>
           </div>
 
           <div class="auth-tabs">
-            <button id="tab-login" class="auth-tab-btn ${activeTab === 'login' ? 'active' : ''}">
-              Sign In to Account
-            </button>
-            <button id="tab-signup" class="auth-tab-btn ${activeTab === 'signup' ? 'active' : ''}">
-              Register Clean Slate (Live Mode)
-            </button>
+            <button id="tab-login" class="auth-tab-btn ${activeTab === 'login' ? 'active' : ''}">Sign In</button>
+            <button id="tab-signup" class="auth-tab-btn ${activeTab === 'signup' ? 'active' : ''}">Register (Live Mode)</button>
           </div>
 
           ${errorMessage ? `
-            <div style="background: var(--color-danger-bg); border: 1px solid var(--color-danger); color: var(--color-danger); padding: 10px 14px; border-radius: var(--radius-md); font-size: 0.84rem; font-weight: 600; margin-bottom: 16px;">
-              ⚠️ ${errorMessage}
+            <div class="error-banner">
+              <span>⚠</span> ${errorMessage}
             </div>
           ` : ''}
 
           ${activeTab === 'login' ? renderLoginForm() : renderSignupForm(selectedRole)}
         </div>
+
       </div>
     `;
 
@@ -158,13 +136,13 @@ export function renderAuthView(container) {
       <form id="form-login" autocomplete="off">
         <div class="form-group">
           <label class="form-label" for="login-email">Email or Demo ID</label>
-          <input type="text" id="login-email" class="form-input" placeholder="e.g. student_testid or custom email" value="" required autocomplete="off">
+          <input type="text" id="login-email" class="form-input" placeholder="e.g. student_testid or your email" autocomplete="off">
         </div>
         <div class="form-group">
           <label class="form-label" for="login-password">Password</label>
-          <input type="password" id="login-password" class="form-input" placeholder="Enter password (or 'demo')" value="" required autocomplete="new-password">
+          <input type="password" id="login-password" class="form-input" placeholder='Password (use "demo" for demo accounts)' autocomplete="new-password">
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:6px;">
           Sign In
         </button>
       </form>
@@ -174,21 +152,22 @@ export function renderAuthView(container) {
   function renderSignupForm(role) {
     return `
       <form id="form-signup" autocomplete="off">
-        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
-          ℹ️ <strong>Live Mode Guarantee:</strong> Registering creates a clean operational state with zero seeded meals or fake KPIs.
+        <div class="info-box" style="margin-bottom:14px;">
+          ℹ&nbsp;<strong>Live Mode:</strong> Creates a clean state with zero seeded meals or fake KPIs.
         </div>
-        <label class="form-label" style="margin-bottom: 8px; display: block;">Select Role</label>
+
+        <label class="form-label" style="margin-bottom:8px;display:block;">Select Role</label>
         <div class="role-selector-grid">
           <div class="role-option-card ${role === 'student' ? 'selected' : ''}" data-role="student">
-            <div class="role-option-icon">🎓</div>
+            <span class="role-option-icon">🎓</span>
             <div class="role-option-title">Resident Student</div>
           </div>
           <div class="role-option-card ${role === 'kitchen' ? 'selected' : ''}" data-role="kitchen">
-            <div class="role-option-icon">👨‍🍳</div>
-            <div class="role-option-title">Kitchen Staff / Chef</div>
+            <span class="role-option-icon">👨‍🍳</span>
+            <div class="role-option-title">Kitchen Staff</div>
           </div>
           <div class="role-option-card ${role === 'admin' ? 'selected' : ''}" data-role="admin">
-            <div class="role-option-icon">🏛️</div>
+            <span class="role-option-icon">🏛️</span>
             <div class="role-option-title">Warden / Admin</div>
           </div>
         </div>
@@ -209,8 +188,8 @@ export function renderAuthView(container) {
           <label class="form-label" for="reg-password">Password</label>
           <input type="password" id="reg-password" class="form-input" placeholder="Choose a password" required minlength="4">
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-          Register Clean Slate (Live Mode)
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:6px;">
+          Create Live Account
         </button>
       </form>
     `;
@@ -225,7 +204,7 @@ export function renderAuthView(container) {
       });
     }
 
-    // Tab buttons
+    // Tab switching
     const tabLogin = container.querySelector('#tab-login');
     const tabSignup = container.querySelector('#tab-signup');
     if (tabLogin && tabSignup) {
@@ -233,44 +212,42 @@ export function renderAuthView(container) {
       tabSignup.onclick = () => { activeTab = 'signup'; errorMessage = ''; update(); };
     }
 
-    // Direct Explore Demo button
+    // Explore Demo direct button
     const btnExploreDirect = container.querySelector('#btn-explore-demo-direct');
     if (btnExploreDirect) {
       btnExploreDirect.onclick = async () => {
         try {
           await store.switchToDemo('student');
           tracker.track('auth.login_completed', { role: 'student', is_demo: true });
-          window.showToast('Launched Demo Mode (Student Experience)', 'success');
+          window.showToast('Demo Mode launched — Student view', 'success');
         } catch (e) {
-          console.error('Demo launch error', e);
           errorMessage = e.message;
           update();
         }
       };
     }
 
-    // Quick demo buttons
-    container.querySelectorAll('.btn-demo-quick').forEach(btn => {
+    // Role-specific demo buttons
+    container.querySelectorAll('.demo-role-btn').forEach(btn => {
       btn.onclick = async () => {
         const demoId = btn.dataset.demoId;
         try {
           await store.login(demoId, 'demo');
           tracker.track('auth.login_completed', { role: store.currentUser.role, is_demo: true });
-          window.showToast(`Logged in as ${store.currentUser.name} (Demo Mode)`, 'success');
+          window.showToast(`Logged in as ${store.currentUser.name}`, 'success');
         } catch (e) {
-          console.error('Demo login error', e);
           errorMessage = e.message;
           update();
         }
       };
     });
 
-    // Login Form Submit
+    // Login form
     const formLogin = container.querySelector('#form-login');
     if (formLogin) {
       formLogin.onsubmit = async (e) => {
         e.preventDefault();
-        const id = document.getElementById('login-email').value;
+        const id = document.getElementById('login-email').value.trim();
         const pass = document.getElementById('login-password').value;
         try {
           await store.login(id, pass);
@@ -283,7 +260,7 @@ export function renderAuthView(container) {
       };
     }
 
-    // Role option cards in registration
+    // Role option cards (signup)
     container.querySelectorAll('.role-option-card').forEach(card => {
       card.onclick = () => {
         selectedRole = card.dataset.role;
@@ -291,7 +268,7 @@ export function renderAuthView(container) {
       };
     });
 
-    // Registration Form Submit
+    // Signup form
     const formSignup = container.querySelector('#form-signup');
     if (formSignup) {
       formSignup.onsubmit = async (e) => {
@@ -300,11 +277,10 @@ export function renderAuthView(container) {
         const email = document.getElementById('reg-email').value;
         const hostelName = document.getElementById('reg-hostel').value;
         const password = document.getElementById('reg-password').value;
-
         try {
           await store.signup({ name, email, password, role: selectedRole, hostelName });
           tracker.track('auth.signup_completed', { role: selectedRole });
-          window.showToast('Account registered successfully in Live Mode with clean operational state!', 'success');
+          window.showToast('Account created — Live Mode active!', 'success');
         } catch (err) {
           errorMessage = err.message;
           update();

@@ -48,179 +48,142 @@ export function renderStudentView(container) {
   const onTimeRate = totalResponded > 0 ? ((onTimeCount / totalResponded) * 100).toFixed(1) : '0.0';
   const foodAvoidedKg = (skipCount * (provider.getFacility().kgPerServing || 0.350)).toFixed(1);
 
-  // If in Live Mode and zero meals published, render Section 4.1 Clean Empty State
+  // If in Live Mode and zero meals published, render clean empty state
   if (publishedMeals.length === 0 && !store.isDemo) {
     container.innerHTML = `
       <div class="student-container">
-        <div class="student-greeting" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px;">
-          <div>
-            <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-              ${greeting}, ${firstName} 👋
-            </h2>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
-              ${user.block} • ${user.hostelName}
-            </span>
+        <div class="student-greeting">
+          <div class="student-greeting-left">
+            <h2>${greeting}, ${firstName}</h2>
+            <div class="student-meta">${user.block} &bull; ${user.hostelName}</div>
           </div>
           <button id="btn-privacy-settings" class="pill-btn">🔒 Privacy</button>
         </div>
 
-        <!-- Section 4.1: Clean Live Empty State -->
-        <div class="card" style="text-align: center; padding: 56px 20px;">
-          <div style="font-size: 2.8rem; margin-bottom: 14px;">🍲</div>
-          <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-            No meals published yet
-          </h3>
-          <p style="font-size: 0.88rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 20px auto; line-height: 1.5;">
-            Your kitchen team for <strong>${user.hostelName}</strong> has not published upcoming menus yet. Eat/Skip decision cards will appear here as soon as published.
+        <div class="card empty-state">
+          <div class="empty-state-icon">🍲</div>
+          <div class="empty-state-title">No meals published yet</div>
+          <p class="empty-state-desc">
+            Your kitchen team for <strong>${user.hostelName}</strong> hasn't published upcoming menus. Meal cards will appear here once published.
           </p>
-          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-            <button id="btn-empty-explore-demo" class="btn btn-primary">
-              🚀 Explore Demo Mode
-            </button>
-          </div>
+          <button id="btn-empty-explore-demo" class="btn btn-primary btn-lg">Explore Demo Mode</button>
         </div>
       </div>
     `;
 
-    const demoBtn = container.querySelector('#btn-empty-explore-demo');
-    if (demoBtn) demoBtn.onclick = () => store.switchToDemo('student');
-
-    const privBtn = container.querySelector('#btn-privacy-settings');
-    if (privBtn) privBtn.onclick = () => window.openPrivacyModal();
+    container.querySelector('#btn-empty-explore-demo')?.addEventListener('click', () => store.switchToDemo('student'));
+    container.querySelector('#btn-privacy-settings')?.addEventListener('click', () => window.openPrivacyModal());
     return;
   }
 
   const html = `
     <div class="student-container">
-      <!-- Greeting & Header -->
-      <div class="student-greeting" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-              ${greeting}, ${firstName} 👋
-            </h2>
-            <span class="badge ${store.isDemo ? 'badge-eat' : 'badge-warning'}" style="font-size: 0.68rem;">
-              ${store.isDemo ? 'Demo Mode' : 'Live Mode'}
+      <!-- Greeting -->
+      <div class="student-greeting">
+        <div class="student-greeting-left">
+          <div class="student-greeting-sub">
+            <span class="badge ${store.isDemo ? 'badge-eat' : 'badge-warning'}">
+              ${store.isDemo ? 'Demo' : 'Live'}
             </span>
           </div>
-          <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
-            ${user.block} • ${user.hostelName}
-          </span>
+          <h2>${greeting}, ${firstName}</h2>
+          <div class="student-meta">${user.block} &bull; ${user.hostelName}</div>
         </div>
-        <div style="display: flex; gap: 6px;">
-          <button id="btn-privacy-settings" class="pill-btn" title="View Privacy Rights">
-            🔒 Privacy
-          </button>
-        </div>
+        <button id="btn-privacy-settings" class="pill-btn">🔒 Privacy</button>
       </div>
 
       <!-- Value Proposition Banner -->
-      <div class="card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-secondary) 100%); border-left: 4px solid var(--brand-accent); padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span style="font-size: 1.6rem;">🌱</span>
+      <div class="value-prop-banner">
+        <div class="value-prop-content">
+          <div class="value-prop-icon-wrap">🌱</div>
           <div>
-            <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); line-height: 1.3;">
-              ${valuePropText}
-            </div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Your response helps the kitchen prepare closer to actual demand, preventing food waste.
-            </div>
+            <div class="value-prop-text">${valuePropText}</div>
+            <div class="value-prop-sub">Your response helps the kitchen minimize over-prep and food waste.</div>
           </div>
         </div>
-
-        <!-- Section 12.1: Experiment Controls (STRICTLY HIDDEN IN LIVE MODE) -->
         ${store.isDemo ? `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="badge" style="font-size: 0.7rem; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color);" title="Experiment Variant Active in Demo">
-              A/B Test: Var ${activeValPropVariant}
-            </span>
-            <button id="btn-toggle-val-prop" class="pill-btn" style="font-size: 0.72rem; padding: 4px 8px;" title="Switch Experiment Variant (Demo Only)">
-              Toggle ⇄
-            </button>
+          <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+            <span class="badge badge-skip" style="font-size:0.66rem;" title="A/B Experiment active">A/B: Var ${activeValPropVariant}</span>
+            <button id="btn-toggle-val-prop" class="pill-btn" style="font-size:0.73rem;padding:5px 10px;">Toggle ⇄</button>
           </div>
         ` : ''}
       </div>
 
-      <!-- Quick Actions Bar -->
-      <div class="student-actions-bar" style="display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px;">
+      <!-- Quick Actions -->
+      <div class="student-actions-bar">
         <button id="btn-bulk-skip-tomorrow" class="pill-btn">⚡ Skip All Tomorrow</button>
         <button id="btn-open-away-modal" class="pill-btn">✈️ Away Mode</button>
-        <button id="btn-scroll-to-impact" class="pill-btn" style="background: var(--color-eat-bg); color: var(--color-eat); border-color: var(--color-eat-border);">
-          🏆 My Impact (${foodAvoidedKg} kg Avoided Prep)
+        <button id="btn-scroll-to-impact" class="pill-btn pill-btn-impact">
+          🏆 My Impact — ${foodAvoidedKg} kg saved
         </button>
       </div>
 
-      <!-- Meal Cards Feed -->
-      <div class="meals-feed" style="display: flex; flex-direction: column; gap: 18px; margin-bottom: 30px;">
+      <!-- Meals Feed -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="meals-section-label">Today's Meals</div>
         ${publishedMeals.map(meal => renderMealCard(meal, now, btnEatLabel, btnSkipLabel)).join('')}
       </div>
 
-      <!-- Section 12: Data-Derived My Impact Card -->
-      <div class="card" id="student-impact-card" style="margin-top: 10px; border-top: 3px solid var(--color-eat);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <div>
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-              <span>🌱</span> My Personal Dining Impact
-            </h3>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">
-              Calculated from your response history (${store.isDemo ? 'Sample Demo History' : 'Live Records'})
-            </span>
+      <!-- My Impact Card -->
+      <div class="card impact-card" id="student-impact-card">
+        <div class="section-header">
+          <div class="section-title">
+            <div class="section-title-icon emerald">🌱</div>
+            My Dining Impact
           </div>
-          <span class="badge badge-eat" style="font-size: 0.76rem;">
-            ${totalResponded > 5 ? 'Active Responder' : 'New Diner'}
-          </span>
+          <span class="badge badge-eat">${totalResponded > 5 ? 'Active Responder' : 'New Diner'}</span>
+        </div>
+        <div style="font-size:0.77rem;color:var(--text-muted);margin-bottom:16px;margin-top:-8px;">
+          Calculated from your response history (${store.isDemo ? 'Sample demo data' : 'Live records'})
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 18px;">
-          <div style="background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-subtle);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary);">${totalResponded}</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Meals Responded</div>
+        <div class="impact-grid">
+          <div class="impact-stat">
+            <div class="impact-stat-num">${totalResponded}</div>
+            <div class="impact-stat-label">Meals Responded</div>
           </div>
-          <div style="background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-subtle);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">${onTimeRate}%</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">On-Time Rate</div>
+          <div class="impact-stat">
+            <div class="impact-stat-num" style="color:var(--brand-primary);">${onTimeRate}%</div>
+            <div class="impact-stat-label">On-Time Rate</div>
           </div>
-          <div style="background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-subtle);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary);">${skipCount}</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Meals Skipped</div>
+          <div class="impact-stat">
+            <div class="impact-stat-num">${skipCount}</div>
+            <div class="impact-stat-label">Meals Skipped</div>
           </div>
-          <div style="background: var(--color-eat-bg); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-eat-border);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">${foodAvoidedKg} kg</div>
-            <div style="font-size: 0.74rem; color: var(--color-eat); font-weight: 700; text-transform: uppercase;">Avoided Prep*</div>
-            <div style="font-size: 0.66rem; color: var(--color-eat); opacity: 0.85;">Demand Signal Contribution</div>
+          <div class="impact-stat highlight">
+            <div class="impact-stat-num">${foodAvoidedKg} kg</div>
+            <div class="impact-stat-label">Avoided Prep*</div>
           </div>
         </div>
 
-        <!-- 4-Week Participation Trend Mini Bar Chart -->
-        <div style="background: var(--bg-secondary); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);">4-Week Response Consistency</span>
-            <span style="font-size: 0.78rem; color: var(--color-eat); font-weight: 600;">
-              ${totalResponded > 0 ? 'Data-derived participation' : 'Awaiting responses'}
-            </span>
+        <!-- 4-Week Participation Chart -->
+        <div class="participation-chart">
+          <div class="chart-label-row">
+            <span class="chart-label">4-Week Response Consistency</span>
+            <span class="chart-status">${totalResponded > 0 ? 'Data-derived' : 'Awaiting responses'}</span>
           </div>
-          <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 55px; gap: 8px; padding-top: 10px;">
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--border-color); height: ${totalResponded > 3 ? '35px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.7rem; color: var(--text-muted);">Week 1</span>
+          <div class="chart-bars">
+            <div class="chart-bar-col">
+              <div class="chart-bar-fill ${totalResponded > 3 ? 'active' : ''}" style="height:${totalResponded > 3 ? '35px' : '6px'};"></div>
+              <span class="chart-bar-label">Wk 1</span>
             </div>
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--border-color); height: ${totalResponded > 5 ? '42px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.7rem; color: var(--text-muted);">Week 2</span>
+            <div class="chart-bar-col">
+              <div class="chart-bar-fill ${totalResponded > 5 ? 'active' : ''}" style="height:${totalResponded > 5 ? '42px' : '6px'};"></div>
+              <span class="chart-bar-label">Wk 2</span>
             </div>
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--color-eat); height: ${totalResponded > 6 ? '48px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.7rem; color: var(--text-muted);">Week 3</span>
+            <div class="chart-bar-col">
+              <div class="chart-bar-fill ${totalResponded > 6 ? 'active' : ''}" style="height:${totalResponded > 6 ? '48px' : '6px'};"></div>
+              <span class="chart-bar-label">Wk 3</span>
             </div>
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--color-eat); height: ${totalResponded > 0 ? '52px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">This Wk</span>
+            <div class="chart-bar-col">
+              <div class="chart-bar-fill current" style="height:${totalResponded > 0 ? '52px' : '6px'};"></div>
+              <span class="chart-bar-label" style="font-weight:700;">This Wk</span>
             </div>
           </div>
         </div>
 
-        <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
-          *<em>Methodology Notice:</em> Estimated avoided preparation based on student demand signal contribution (0.350 kg/portion avoided whenever an advance skip allowed the kitchen to downsize cook batches prior to cauldron preparation).
+        <div class="impact-methodology">
+          *<em>Methodology:</em> Estimated avoided preparation based on student demand signal contribution (0.350 kg/portion avoided when advance skip allowed kitchen to downsize cook batches prior to cauldron prep).
         </div>
       </div>
     </div>
@@ -236,16 +199,16 @@ function renderMealCard(meal, now, btnEatLabel, btnSkipLabel) {
   const isPastCutoff = now > cutoff;
   const isConcluded = now > endsAt || meal.status === 'closed';
 
-  let countdownText = 'Calculating cutoff...';
+  let countdownText = 'Calculating…';
   if (isConcluded) {
     countdownText = 'Service Concluded';
   } else if (isPastCutoff) {
-    countdownText = 'Cutoff Passed (Late responses accepted)';
+    countdownText = 'Cutoff Passed';
   } else {
     const diffMs = cutoff - now;
     const mins = Math.floor(diffMs / 60000);
     const secs = Math.floor((diffMs % 60000) / 1000);
-    countdownText = `Response closes in ${mins}m ${secs}s`;
+    countdownText = `Closes in ${mins}m ${secs}s`;
   }
 
   const isEatSelected = meal.myResponse === 'eat';
@@ -253,58 +216,62 @@ function renderMealCard(meal, now, btnEatLabel, btnSkipLabel) {
 
   return `
     <div class="meal-card ${isEatSelected ? 'responded-eat' : ''} ${isSkipSelected ? 'responded-skip' : ''}" data-meal-id="${meal.id}">
-      <div class="meal-card-header">
-        <div class="meal-title-group">
-          <h3>
-            ${getMealIcon(meal.type)} ${capitalize(meal.type)}
-            <span class="badge ${isConcluded ? 'badge-skip' : (isPastCutoff ? 'badge-warning' : 'badge-eat')}">
-              ${isConcluded ? 'Closed' : capitalize(meal.status)}
-            </span>
-          </h3>
-          <div class="meal-time">${formatDate(meal.mealDate)} • ${meal.startsAt.split('T')[1].substring(0, 5)} - ${meal.endsAt.split('T')[1].substring(0, 5)}</div>
+
+      <!-- Top Bar -->
+      <div class="meal-card-topbar">
+        <div class="meal-type-chip">
+          <div class="meal-type-icon">${getMealIcon(meal.type)}</div>
+          ${capitalize(meal.type)}
+          <span class="badge ${isConcluded ? 'badge-skip' : (isPastCutoff ? 'badge-warning' : 'badge-eat')}" style="margin-left:6px;">
+            ${isConcluded ? 'Closed' : capitalize(meal.status)}
+          </span>
         </div>
-        <div class="countdown-badge ${isPastCutoff ? 'expired' : ''}">
-          ⏱️ ${countdownText}
+        <div class="countdown-badge ${isConcluded || isPastCutoff ? 'expired' : ''}">
+          ${!isConcluded && !isPastCutoff ? '<span class="cd-dot"></span>' : '⏱'}
+          ${countdownText}
         </div>
       </div>
 
-      <div style="margin-bottom: 12px;">
-        <div style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; color: var(--text-primary);">${meal.name}</div>
-        <div class="menu-items-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
+      <!-- Body -->
+      <div class="meal-card-body">
+        <div class="meal-title-group">
+          <div class="meal-name">${meal.name}</div>
+          <div class="meal-time">${formatDate(meal.mealDate)} &bull; ${meal.startsAt.split('T')[1].substring(0,5)} – ${meal.endsAt.split('T')[1].substring(0,5)}</div>
+        </div>
+
+        <div class="menu-items-list">
           ${(meal.items || []).map(item => `<span class="menu-item-tag">${item}</span>`).join('')}
         </div>
+
+        ${!isConcluded ? `
+          <div class="meal-response-section">
+            <div class="meal-response-question">
+              <span>Are you eating this meal?</span>
+              <span class="response-1tap-hint">1-tap</span>
+            </div>
+            <div class="response-actions">
+              <button class="response-btn response-btn-eat ${isEatSelected ? 'selected' : ''}" data-action="eat" data-meal-id="${meal.id}">
+                🍽️ ${btnEatLabel}
+              </button>
+              <button class="response-btn response-btn-skip ${isSkipSelected ? 'selected' : ''}" data-action="skip" data-meal-id="${meal.id}">
+                ✕ ${btnSkipLabel}
+              </button>
+            </div>
+            ${isPastCutoff ? `<div class="late-notice"><span>⚠</span> Cutoff passed — changes won't alter the cook order.</div>` : ''}
+          </div>
+        ` : ''}
       </div>
 
-      ${!isConcluded ? `
-        <!-- Section 7.1: Are you eating? One-Tap Decision -->
-        <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; border: 1px solid var(--border-subtle); margin-top: 10px;">
-          <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-            <span>Are you eating this meal?</span>
-            <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted);">1-Tap Decision</span>
-          </div>
-          <div class="response-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="response-btn response-btn-eat ${isEatSelected ? 'selected' : ''}" data-action="eat" data-meal-id="${meal.id}">
-              🍽️ ${btnEatLabel}
-            </button>
-            <button class="response-btn response-btn-skip ${isSkipSelected ? 'selected' : ''}" data-action="skip" data-meal-id="${meal.id}">
-              🚫 ${btnSkipLabel}
-            </button>
-          </div>
-          ${isPastCutoff ? `<div class="late-notice" style="margin-top: 8px;">⚠️ Cutoff has passed. Changes will be recorded as late and will not alter the kitchen's cook order.</div>` : ''}
-        </div>
-      ` : `
-        <!-- Post-Meal Review -->
-        <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">How was this meal?</span>
-            <div class="rating-bar" data-meal-id="${meal.id}">
-              ${[1, 2, 3, 4, 5].map(star => `
-                <button class="star-btn ${meal.rating && meal.rating >= star ? 'active' : ''}" data-star="${star}">★</button>
-              `).join('')}
-            </div>
+      ${isConcluded ? `
+        <div class="meal-rating-section">
+          <span class="meal-rating-label">Rate this meal</span>
+          <div class="rating-bar" data-meal-id="${meal.id}">
+            ${[1,2,3,4,5].map(star => `
+              <button class="star-btn ${meal.rating && meal.rating >= star ? 'active' : ''}" data-star="${star}" aria-label="${star} stars">★</button>
+            `).join('')}
           </div>
         </div>
-      `}
+      ` : ''}
     </div>
   `;
 }

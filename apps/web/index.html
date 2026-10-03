@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MealSense — Institutional Dining & Food Waste Prevention</title>
-  <meta name="description" content="Production institutional dining and mess food waste reduction platform enforcing intent tracking, conformal ML forecasting, and zero-trust privacy.">
+  <title>MealSense — Dining Intelligence Platform</title>
+  <meta name="description" content="Institutional dining & food-waste prevention platform. Intent tracking, ML forecasting, and zero-waste kitchen decisions.">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#f6f3ed">
+  <meta name="theme-color" content="#FFF7E6">
 
-  <!-- Typography: Inter -->
+  <!-- Typography: Plus Jakarta Sans + Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Design System Stylesheets: Warm Beige & Brown Palette -->
+  <!-- Design System -->
   <link rel="stylesheet" href="styles/design-tokens.css">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/student.css">
@@ -22,42 +22,37 @@
 </head>
 <body>
 
-  <!-- Header with Brand and Session Controls -->
+  <!-- ── App Header ───────────────────────────────────────── -->
   <header class="app-header">
-    <a href="#" class="brand">
+    <a href="#" class="brand" aria-label="MealSense Home">
       <div class="brand-icon">🍽️</div>
-      <div>
+      <div class="brand-name-group">
         <div class="brand-title">MealSense</div>
-        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Dining Intelligence Platform</div>
+        <div class="brand-subtitle">Dining Intelligence</div>
       </div>
     </a>
-
-    <!-- Populated dynamically by app.js (User Profile + Logout only; NO role switcher) -->
-    <div id="header-nav-container" style="display: flex; align-items: center; gap: 14px;"></div>
+    <!-- Populated by app.js -->
+    <div id="header-nav-container" style="display:flex;align-items:center;gap:8px;"></div>
   </header>
 
-  <!-- Demo Mode Persistent Banner (Section 3.2) -->
-  <div id="demo-mode-banner" class="demo-mode-banner" style="display: none;"></div>
+  <!-- ── Demo Mode Banner ──────────────────────────────────── -->
+  <div id="demo-mode-banner" class="demo-mode-banner" style="display:none;"></div>
 
-  <!-- Guided PM Walkthrough Tour Banner -->
-  <div id="guided-tour-banner" class="guided-tour-banner" style="display: none;"></div>
+  <!-- ── Guided PM Tour Banner ────────────────────────────── -->
+  <div id="guided-tour-banner" class="guided-tour-banner" style="display:none;"></div>
 
-  <!-- Dynamic Authorized Role Viewport -->
-  <main class="app-main" id="view-container">
-    <!-- Rendered dynamically by js/app.js based strictly on authenticated role -->
-  </main>
+  <!-- ── Main View (role-based) ───────────────────────────── -->
+  <main class="app-main" id="view-container" role="main"></main>
 
-  <!-- Universal Modal Overlay -->
-  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
-    <div class="modal-content" id="modal-body">
-      <!-- Populated dynamically -->
-    </div>
+  <!-- ── Modal ────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content" id="modal-body"></div>
   </div>
 
-  <!-- Accessible Toast Notification Hub -->
-  <div id="toast-container" aria-live="polite"></div>
+  <!-- ── Toast Hub ────────────────────────────────────────── -->
+  <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
 
-  <!-- Application Modules -->
+  <!-- ── App Bootstrap ────────────────────────────────────── -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -47,16 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
     demoBanner.style.display = 'block';
     demoBanner.innerHTML = `
       <div class="demo-banner-inner">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="badge badge-eat" style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em;">DEMO MODE</span>
-          <span style="color: var(--text-primary); font-weight: 600; font-size: 0.82rem;">Sample operational data</span>
-          <span style="color: var(--text-muted); font-size: 0.8rem;">• Explore the complete MealSense workflow without entering data</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="badge badge-warning">⚡ Demo Mode</span>
+          <span style="color:var(--text-secondary);font-weight:600;font-size:0.82rem;">Sample operational data &mdash; explore the full workflow</span>
         </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button id="btn-reset-demo-banner" class="btn btn-secondary btn-sm" style="padding: 3px 10px; font-size: 0.72rem;" title="Reset demo dataset back to initial seeded state">
-            🔄 Reset Demo
+        <div style="display:flex;gap:7px;align-items:center;">
+          <button id="btn-reset-demo-banner" class="pill-btn" style="font-size:0.75rem;padding:5px 12px;" title="Reset demo dataset">
+            ↺ Reset
           </button>
-          <button id="btn-exit-demo-banner" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 0.72rem;" title="Sign out of demo mode">
+          <button id="btn-exit-demo-banner" class="pill-btn" style="font-size:0.75rem;padding:5px 12px;" title="Exit demo">
             Exit Demo
           </button>
         </div>
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!store.isAuthenticated) {
       headerNavContainer.innerHTML = `
         <div class="header-actions">
-          <button id="btn-theme-toggle" class="theme-toggle-btn" title="Toggle theme">
+          <button id="btn-theme-toggle" class="theme-toggle-btn" title="Toggle light/dark theme" aria-label="Toggle theme">
             ${store.theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>
@@ -87,37 +86,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const user = store.currentUser;
       const roleLabel = user.role.toUpperCase();
       const isDemo = Boolean(user.isDemo);
+      const initials = user.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
 
       headerNavContainer.innerHTML = `
-        <div class="header-actions" style="display: flex; align-items: center; gap: 10px;">
+        <div class="header-actions">
           ${isDemo ? `
-            <button id="btn-header-tour-toggle" class="pill-btn" style="background: ${store.guidedTour.active ? 'var(--brand-primary)' : 'var(--bg-secondary)'}; color: ${store.guidedTour.active ? '#fff' : 'var(--brand-primary)'}; font-size: 0.74rem; font-weight: 700; border-color: var(--brand-accent);">
-              ${store.guidedTour.active ? '⏸️ Active Tour' : '🚀 Guided Tour'}
+            <button id="btn-header-tour-toggle" class="pill-btn" style="${store.guidedTour.active ? 'background:var(--color-eat-bg);color:var(--color-eat);border-color:var(--color-eat-border);' : ''}font-size:0.75rem;">
+              ${store.guidedTour.active ? '◉ Tour Active' : '▶ Guided Tour'}
             </button>
           ` : ''}
 
           <div class="user-profile-badge">
-            <span style="font-weight: 700;">${user.name}</span>
+            <div class="user-avatar">${initials}</div>
+            <span style="font-weight:600;font-size:0.83rem;">${user.name.split(' ')[0]}</span>
             <span class="user-role-tag">${roleLabel}</span>
           </div>
 
-          <button id="btn-theme-toggle" class="theme-toggle-btn" title="Toggle theme">
+          <button id="btn-theme-toggle" class="theme-toggle-btn" title="Toggle theme" aria-label="Toggle theme">
             ${store.theme === 'light' ? '🌙' : '☀️'}
           </button>
 
-          <button id="btn-sign-out" class="btn btn-secondary btn-sm" title="Log out to switch role or account">
-            🚪 Log Out
+          <button id="btn-sign-out" class="btn btn-secondary btn-sm" title="Sign out">
+            Sign out
           </button>
         </div>
       `;
 
-      // Log out handler
       document.getElementById('btn-sign-out').onclick = () => {
         store.logout();
-        window.showToast('Session ended. Please sign in to continue.', 'warning');
+        window.showToast('Signed out successfully', 'warning');
       };
 
-      // Header Tour Toggle
       const tourBtn = document.getElementById('btn-header-tour-toggle');
       if (tourBtn) {
         tourBtn.onclick = async () => {
@@ -130,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Theme toggle
     const themeBtn = document.getElementById('btn-theme-toggle');
     if (themeBtn) {
       themeBtn.onclick = () => store.toggleTheme();
@@ -148,31 +146,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const currentStepIndex = store.guidedTour.step - 1;
     const stepConfig = store.guidedTour.steps[currentStepIndex];
+    const totalSteps = store.guidedTour.totalSteps;
+    const currentStep = store.guidedTour.step;
 
     guidedTourBanner.style.display = 'block';
     guidedTourBanner.innerHTML = `
       <div class="guided-tour-inner">
         <div class="tour-content-group">
-          <span class="tour-step-indicator">${stepConfig.title}</span>
+          <span class="tour-step-indicator">
+            <span class="tour-step-indicator-dot"></span>
+            ${stepConfig.title} &mdash; ${currentStep}/${totalSteps}
+          </span>
           <div>
             <div class="tour-title">${stepConfig.description}</div>
-            <div class="tour-desc">👉 <strong>Action:</strong> ${stepConfig.actionHint}</div>
+            <div class="tour-desc">→ <strong>Action:</strong> ${stepConfig.actionHint}</div>
           </div>
         </div>
 
         <div class="tour-controls">
-          ${store.guidedTour.step > 1 ? `
-            <button id="btn-tour-prev" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.76rem;">
+          ${currentStep > 1 ? `
+            <button id="btn-tour-prev" class="btn btn-secondary btn-sm">
               ← Prev
             </button>
           ` : ''}
-
-          <button id="btn-tour-next" class="btn btn-primary btn-sm" style="padding: 4px 12px; font-size: 0.76rem;">
-            ${store.guidedTour.step === store.guidedTour.totalSteps ? 'Finish Tour ✓' : 'Next Step →'}
+          <button id="btn-tour-next" class="btn btn-primary btn-sm">
+            ${currentStep === totalSteps ? 'Finish ✓' : 'Next →'}
           </button>
-
-          <button id="btn-tour-exit" class="btn btn-secondary btn-sm" style="padding: 4px 8px; font-size: 0.74rem;" title="Exit Guided Tour">
-            ✕ Exit
+          <button id="btn-tour-exit" class="btn btn-secondary btn-sm" title="Exit tour">
+            ✕
           </button>
         </div>
       </div>
@@ -196,12 +197,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span>${type === 'success' ? '✓' : (type === 'warning' ? '⚠️' : '✕')}</span> <span>${message}</span>`;
+    const icons = { success: '✓', warning: '⚠', error: '✕', info: 'ℹ' };
+    const icon = icons[type] || icons.success;
+    toast.innerHTML = `
+      <div class="toast-icon">${icon}</div>
+      <span>${message}</span>
+    `;
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 250);
-    }, 3500);
+      setTimeout(() => toast.remove(), 280);
+    }, 3800);
   };
 
   // Modals
@@ -215,19 +221,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Away Mode Modal (Student)
   window.openAwayModal = function() {
     modalBody.innerHTML = `
-      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">✈️ Set Away Mode</h3>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-        Going home or off-campus? Setting away mode automatically marks all meals during your trip as 'Skip' so the mess doesn't cook excess food.
-      </p>
-      <div class="form-group">
-        <label class="form-label">From Date</label>
-        <input type="date" id="away-from" class="form-input" style="width: 100%;" value="${new Date().toISOString().split('T')[0]}">
+      <div class="modal-header">
+        <div class="modal-header-icon" style="background:var(--color-info-bg);border-color:rgba(96,165,250,0.25);">✈️</div>
+        <div>
+          <div class="modal-title" id="modal-title">Set Away Mode</div>
+          <div class="modal-subtitle">Mark all meals as Skip while you're away from campus.</div>
+        </div>
       </div>
       <div class="form-group">
-        <label class="form-label">To Date</label>
-        <input type="date" id="away-to" class="form-input" style="width: 100%;" value="${new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0]}">
+        <label class="form-label" for="away-from">From Date</label>
+        <input type="date" id="away-from" class="form-input" style="width:100%;" value="${new Date().toISOString().split('T')[0]}">
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+      <div class="form-group">
+        <label class="form-label" for="away-to">To Date</label>
+        <input type="date" id="away-to" class="form-input" style="width:100%;" value="${new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0]}">
+      </div>
+      <div class="modal-footer">
         <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
         <button id="modal-confirm-away-btn" class="btn btn-primary">Confirm Away Range</button>
       </div>
@@ -240,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const to = document.getElementById('away-to').value;
       const res = await api.setAway(from, to);
       closeModal();
-      window.showToast(`Away mode activated for ${res.count} meals`, 'success');
+      window.showToast(`Away mode set for ${res.count} meals`, 'success');
     };
   };
 
@@ -251,52 +260,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const prepTarget = existingDecision ? existingDecision.selectedQuantity : 362;
 
     modalBody.innerHTML = `
-      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-        📝 60-Second Realized Outcome Audit
-      </h3>
-      <span style="font-size: 0.82rem; color: var(--text-muted);">${meal.name} • ${meal.mealDate}</span>
+      <div class="modal-header">
+        <div class="modal-header-icon" style="background:var(--color-warning-bg);border-color:var(--color-warning-border);">📋</div>
+        <div>
+          <div class="modal-title" id="modal-title">Realized Outcome Audit</div>
+          <div class="modal-subtitle">${meal.name} &bull; ${meal.mealDate}</div>
+        </div>
+      </div>
 
-      <div style="margin-top: 16px;">
-        <div class="form-group">
-          <label class="form-label">1. Actual Headcount (Diners Attended)</label>
-          <input type="number" id="inp-actual-count" class="number-input" value="348" style="width: 100%;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inp-actual-count">Actual Headcount</label>
+          <input type="number" id="inp-actual-count" class="form-input" value="348" style="width:100%;">
         </div>
-        <div class="form-group">
-          <label class="form-label">2. Prepared Servings Cooked</label>
-          <input type="number" id="inp-prepared-servings" class="number-input" value="${prepTarget}" style="width: 100%;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inp-prepared-servings">Prepared Servings Cooked</label>
+          <input type="number" id="inp-prepared-servings" class="form-input" value="${prepTarget}" style="width:100%;">
         </div>
-        <div class="form-group">
-          <label class="form-label">3. Surplus Food Disposition</label>
-          <select id="sel-surplus-disposition" class="form-select" style="width: 100%;">
-            <option value="refrigerated" selected>Refrigerated / Chilled for Next Service</option>
-            <option value="donated">Donated to Campus Hunger Relief Partner</option>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="sel-surplus-disposition">Surplus Food Disposition</label>
+          <select id="sel-surplus-disposition" class="form-select" style="width:100%;">
+            <option value="refrigerated" selected>Refrigerated for Next Service</option>
+            <option value="donated">Donated to Campus Hunger Relief</option>
             <option value="discarded">Discarded (Organic Waste)</option>
           </select>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div class="form-group">
-            <label class="form-label">4. Unserved Tray Surplus (kg)</label>
-            <input type="number" step="0.1" id="inp-unserved-kg" class="number-input" value="2.8" style="width: 100%;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="inp-unserved-kg">Unserved Surplus (kg)</label>
+            <input type="number" step="0.1" id="inp-unserved-kg" class="form-input" value="2.8" style="width:100%;">
           </div>
-          <div class="form-group">
-            <label class="form-label">5. Plate Waste (kg)</label>
-            <input type="number" step="0.1" id="inp-uneaten-kg" class="number-input" value="4.2" style="width: 100%;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="inp-uneaten-kg">Plate Waste (kg)</label>
+            <input type="number" step="0.1" id="inp-uneaten-kg" class="form-input" value="4.2" style="width:100%;">
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; margin: 12px 0; background: rgba(179, 57, 39, 0.05); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-          <input type="checkbox" id="chk-ran-short" style="width: 18px; height: 18px; accent-color: var(--color-danger);">
-          <label for="chk-ran-short" style="font-size: 0.85rem; font-weight: 700; color: var(--color-danger);">
-            Ran Short (Inviolable Guardrail Alert)
-          </label>
+        <div class="guardrail-warning" style="cursor:pointer;" id="ran-short-row">
+          <input type="checkbox" id="chk-ran-short" style="width:16px;height:16px;accent-color:var(--color-danger);flex-shrink:0;">
+          <label for="chk-ran-short" style="cursor:pointer;font-weight:700;">Ran Short &mdash; Inviolable Guardrail Alert</label>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+      <div class="modal-footer">
         <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
-        <button id="modal-submit-outcomes-btn" class="btn btn-primary">Save & Close Meal Loop</button>
+        <button id="modal-submit-outcomes-btn" class="btn btn-primary">Save &amp; Close Loop</button>
       </div>
     `;
     modalOverlay.classList.add('active');
+
+    document.getElementById('ran-short-row').onclick = (e) => {
+      if (e.target.tagName !== 'INPUT') document.getElementById('chk-ran-short').click();
+    };
 
     document.getElementById('modal-cancel-btn').onclick = closeModal;
     document.getElementById('modal-submit-outcomes-btn').onclick = async () => {
@@ -308,12 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const ranShort = document.getElementById('chk-ran-short').checked;
 
       await api.recordOutcomes(meal.id, {
-        actualCount,
-        preparedServings,
-        surplusDisposition,
-        unservedKg,
-        uneatenKg,
-        ranShort,
+        actualCount, preparedServings, surplusDisposition, unservedKg, uneatenKg, ranShort,
         wasteRecords: [
           { wasteType: 'not_served', category: 'general', quantityKg: unservedKg, donated: surplusDisposition === 'donated' },
           { wasteType: 'uneaten', category: 'plate_waste', quantityKg: uneatenKg, donated: false },
@@ -321,53 +330,58 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       closeModal();
-      window.showToast('Meal outcomes recorded successfully. Decision loop closed!', 'success');
+      window.showToast('Outcomes recorded. Meal loop closed!', 'success');
     };
   };
 
   // Create Meal Modal (Kitchen / Admin)
   window.openCreateMealModal = function() {
     modalBody.innerHTML = `
-      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">🍲 Publish New Meal Service</h3>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
-        Publish an upcoming meal menu and define student cutoff deadlines.
-      </p>
-      <div class="form-group">
-        <label class="form-label">Meal Type</label>
-        <select id="new-meal-type" class="form-select">
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch" selected>Lunch</option>
-          <option value="snacks">Evening Snacks</option>
-          <option value="dinner">Dinner</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input type="date" id="new-meal-date" class="form-input" value="${new Date().toISOString().split('T')[0]}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Menu Title</label>
-        <input type="text" id="new-meal-name" class="form-input" placeholder="e.g. Special Weekend Biryani Lunch" value="Special Sunday Biryani & Raita">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Dishes (comma separated)</label>
-        <input type="text" id="new-meal-items" class="form-input" placeholder="Dish 1, Dish 2, Dish 3" value="Veg Dum Biryani, Mirchi Ka Salan, Burani Raita, Roasted Papad, Gulab Jamun">
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-        <div class="form-group">
-          <label class="form-label">Start Time</label>
-          <input type="time" id="new-meal-start" class="form-input" value="12:30">
-        </div>
-        <div class="form-group">
-          <label class="form-label">End Time</label>
-          <input type="time" id="new-meal-end" class="form-input" value="14:30">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cutoff Time</label>
-          <input type="time" id="new-meal-cutoff" class="form-input" value="10:30">
+      <div class="modal-header">
+        <div class="modal-header-icon">🍲</div>
+        <div>
+          <div class="modal-title" id="modal-title">Publish Meal Service</div>
+          <div class="modal-subtitle">Define menu, timing, and response cutoff.</div>
         </div>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div class="form-group">
+          <label class="form-label" for="new-meal-type">Meal Type</label>
+          <select id="new-meal-type" class="form-select">
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch" selected>Lunch</option>
+            <option value="snacks">Evening Snacks</option>
+            <option value="dinner">Dinner</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-meal-date">Date</label>
+          <input type="date" id="new-meal-date" class="form-input" value="${new Date().toISOString().split('T')[0]}">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-meal-name">Menu Title</label>
+          <input type="text" id="new-meal-name" class="form-input" placeholder="e.g. Weekend Biryani Lunch" value="Special Sunday Biryani &amp; Raita">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-meal-items">Dishes (comma-separated)</label>
+          <input type="text" id="new-meal-items" class="form-input" placeholder="Dish 1, Dish 2..." value="Veg Dum Biryani, Mirchi Ka Salan, Burani Raita, Papad, Gulab Jamun">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div class="form-group">
+            <label class="form-label" for="new-meal-start">Start</label>
+            <input type="time" id="new-meal-start" class="form-input" value="12:30">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-meal-end">End</label>
+            <input type="time" id="new-meal-end" class="form-input" value="14:30">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-meal-cutoff">Cutoff</label>
+            <input type="time" id="new-meal-cutoff" class="form-input" value="10:30">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
         <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
         <button id="modal-publish-meal-btn" class="btn btn-primary">Publish Meal</button>
       </div>
@@ -384,44 +398,41 @@ document.addEventListener('DOMContentLoaded', () => {
       const endTime = document.getElementById('new-meal-end').value;
       const cutoffTime = document.getElementById('new-meal-cutoff').value;
 
-      store.createMeal({
-        type,
-        mealDate,
-        name,
-        items,
-        startTime,
-        endTime,
-        cutoffTime,
-      });
-
+      store.createMeal({ type, mealDate, name, items, startTime, endTime, cutoffTime });
       closeModal();
-      window.showToast(`Published ${name} for ${mealDate}!`, 'success');
+      window.showToast(`Published: ${name}`, 'success');
     };
   };
 
   // Privacy & Data Rights Modal
   window.openPrivacyModal = function() {
     modalBody.innerHTML = `
-      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">🔒 Privacy & Your DPDP Rights</h3>
-      <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-        <p><strong>Your Privacy is Enforced by Cryptography & Database RLS:</strong></p>
-        <ul style="margin-left: 20px; margin-top: 6px;">
-          <li>Your individual Eat/Skip responses are <strong>strictly invisible</strong> to kitchen staff and wardens.</li>
-          <li>The kitchen only sees anonymous aggregate totals (e.g. 318 students eating).</li>
-          <li>No personal location, contacts, or reasons for skipping are ever requested or stored.</li>
+      <div class="modal-header">
+        <div class="modal-header-icon" style="background:rgba(96,165,250,0.10);border-color:rgba(96,165,250,0.25);">🔒</div>
+        <div>
+          <div class="modal-title" id="modal-title">Privacy &amp; Data Rights</div>
+          <div class="modal-subtitle">Your data, enforced by cryptography &amp; RLS.</div>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-bottom:16px;">
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+          <li style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--brand-primary);flex-shrink:0;">✓</span> Your Eat/Skip choices are <strong style="color:var(--text-primary);">strictly invisible</strong> to kitchen staff &amp; wardens.</li>
+          <li style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--brand-primary);flex-shrink:0;">✓</span> Kitchen only sees anonymous aggregate totals.</li>
+          <li style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--brand-primary);flex-shrink:0;">✓</span> No location, contacts, or skip reasons ever stored.</li>
         </ul>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
-        <button id="btn-export-data" class="btn btn-secondary" style="width: 100%;">
-          📥 Export My Personal Data (JSON)
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button id="btn-export-data" class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;">
+          <span>📥</span> Export My Data (JSON)
         </button>
-        <button id="btn-delete-account" class="btn btn-danger" style="width: 100%;">
-          🗑️ Anonymize & Delete My Account
+        <button id="btn-delete-account" class="btn btn-danger" style="width:100%;justify-content:flex-start;gap:12px;">
+          <span>🗑️</span> Anonymize &amp; Delete Account
         </button>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+      <div class="modal-footer">
         <button id="modal-cancel-btn" class="btn btn-secondary">Close</button>
       </div>
     `;
@@ -441,10 +452,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.getElementById('btn-delete-account').onclick = async () => {
-      if (confirm('Are you sure you want to delete and anonymize your account? This action cannot be undone.')) {
+      if (confirm('Are you sure? This permanently anonymizes and deletes your account.')) {
         await api.deleteAccount();
         closeModal();
-        window.showToast('Account anonymized. All personal channels deleted.', 'warning');
+        window.showToast('Account anonymized and deleted.', 'warning');
       }
     };
   };

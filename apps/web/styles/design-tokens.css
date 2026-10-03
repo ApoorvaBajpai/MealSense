@@ -1,107 +1,248 @@
 /* ==========================================================================
-   MealSense Design System Tokens: Warm Beige & Espresso Brown Theme
-   Sophisticated, tactile, editorial aesthetic inspired by natural linen, 
-   warm parchment, toasted wheat, rich caramel, and deep espresso.
+   MealSense Design System — Light Vanilla × Midnight Navy Edition
+   Art Direction: Light Vanilla (#FFF7E6) × Midnight Navy (#0A122A)
+   High-contrast, razor-sharp, editorial institutional dining intelligence.
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
+
 :root {
-  /* Default: Warm Beige & Cream Light Palette */
-  --bg-primary: #f6f3ed;          /* Soft warm linen / oatmeal */
-  --bg-secondary: #eee9df;        /* Toasted almond / pale sand */
-  --bg-surface: #ffffff;          /* Crisp warm parchment */
-  --bg-surface-elevated: #faf7f2; /* Cream card elevated */
-  --bg-glass: rgba(246, 243, 237, 0.88);
-  --border-color: #e2dbce;        /* Muted sand border */
-  --border-subtle: #eee7dc;
-  --border-focus: #7a4620;        /* Warm coffee outline */
+  /* ── Core Palette Swatches (Direct from Specification) ────── */
+  --palette-vanilla:       #FFF7E6;      /* Light Vanilla */
+  --palette-midnight-navy: #0A122A;      /* Midnight Navy */
 
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --text-primary: #231c16;        /* Deep roasted espresso */
-  --text-secondary: #5c4f44;      /* Warm roasted walnut / taupe */
-  --text-muted: #8c7d70;          /* Soft stone / dried clay */
-  --text-inverse: #fcf9f5;
+  /* ── Foundational Surfaces (Light Vanilla Canvas & Crisp White Cards) */
+  --bg-base:               #F9EED4;      /* Rich warm vanilla base */
+  --bg-primary:            #FFF7E6;      /* Exact Light Vanilla canvas */
+  --bg-secondary:          #F3E5C8;      /* Warm vanilla cream secondary */
+  --bg-surface:            #FFFFFF;      /* Brilliant pure white card — pops off the vanilla canvas */
+  --bg-surface-2:          #FFFDF9;      /* Luminous elevated surface */
+  --bg-surface-3:          #F2E2C2;      /* Accent vanilla panel */
 
-  /* Brand Accents (Chestnut, Caramel, Terracotta) */
-  --brand-primary: #63391b;       /* Rich chestnut brown */
-  --brand-hover: #4d2a13;
-  --brand-accent: #c47c2b;        /* Warm caramel amber */
-  --brand-gradient: linear-gradient(135deg, #6b3e1f 0%, #9a5828 50%, #b86e33 100%);
-  --brand-glow: rgba(99, 57, 27, 0.18);
+  /* ── Glass Layer (Frosted Light Vanilla) ─────────────────── */
+  --glass-bg:              rgba(255, 247, 230, 0.92);
+  --glass-bg-light:        rgba(255, 255, 255, 0.88);
+  --glass-border:          rgba(10, 18, 42, 0.10);
+  --glass-border-hover:    rgba(10, 18, 42, 0.22);
 
-  /* Semantic State Colors (Harmonized with earthy palette) */
-  --color-eat: #2d6a4f;           /* Earthy forest sage */
-  --color-eat-bg: rgba(45, 106, 79, 0.10);
-  --color-eat-border: rgba(45, 106, 79, 0.35);
+  /* ── Borders (Midnight Navy Outlines) ────────────────────── */
+  --border-subtle:         rgba(10, 18, 42, 0.08);
+  --border-default:        rgba(10, 18, 42, 0.15);  /* Clean midnight navy border */
+  --border-strong:         rgba(10, 18, 42, 0.32);  /* Crisp high-contrast border */
+  --border-blue:           rgba(29, 78, 216, 0.25); /* Subtle royal blue border */
 
-  --color-skip: #73675c;          /* Warm stone taupe */
-  --color-skip-bg: rgba(115, 103, 92, 0.12);
-  --color-skip-border: rgba(115, 103, 92, 0.35);
+  /* ── Accent Midnight Navy Lines ─────────────────────────── */
+  --line-navy:             linear-gradient(90deg, transparent, rgba(10, 18, 42, 0.40) 20%, #0A122A 50%, rgba(10, 18, 42, 0.40) 80%, transparent 100%);
+  --line-navy-solid:       linear-gradient(90deg, #0A122A 0%, #15234E 50%, #1E3168 100%);
 
-  --color-warning: #b45309;       /* Deep amber / burnt honey */
-  --color-warning-bg: rgba(180, 83, 9, 0.10);
+  /* ── Typography (17:1 Contrast Midnight Navy) ───────────── */
+  --font-display:          'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+  --font-body:             'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --color-danger: #9f2a1c;        /* Terracotta rust / dried brick */
-  --color-danger-bg: rgba(159, 42, 28, 0.10);
+  --text-primary:          #0A122A;      /* Midnight Navy: 17:1+ contrast on vanilla & white */
+  --text-secondary:        #36415C;      /* Slate Midnight Navy */
+  --text-muted:            #687492;      /* Muted Navy */
+  --text-inverse:          #FFF7E6;      /* Light Vanilla */
 
-  --color-info: #43615f;          /* Muted slate / river stone */
-  --color-info-bg: rgba(67, 97, 95, 0.10);
+  /* ── Brand: Midnight Navy Palette Shades (#0A122A) ───────── */
+  --navy-50:               rgba(10, 18, 42, 0.04);
+  --navy-100:              rgba(10, 18, 42, 0.08);
+  --navy-200:              rgba(10, 18, 42, 0.16);
+  --navy-300:              rgba(10, 18, 42, 0.28);
+  --navy-400:              #36415C;
+  --navy-500:              #1E3168;
+  --navy-600:              #15234E;
+  --navy-700:              #0A122A;      /* Exact Midnight Navy from user image */
+  --navy-800:              #050917;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(60, 45, 30, 0.06);
-  --shadow-md: 0 4px 10px rgba(60, 45, 30, 0.08), 0 1px 3px rgba(60, 45, 30, 0.04);
-  --shadow-lg: 0 12px 28px rgba(60, 45, 30, 0.11), 0 4px 10px rgba(60, 45, 30, 0.06);
-  --shadow-glow: 0 4px 16px var(--brand-glow);
+  /* Aliases for legacy component compatibility */
+  --emerald-50:            rgba(10, 18, 42, 0.05);
+  --emerald-100:           rgba(10, 18, 42, 0.10);
+  --emerald-300:           rgba(10, 18, 42, 0.25);
+  --emerald-400:           #0A122A;
+  --emerald-500:           #15234E;
+  --emerald-600:           #0A122A;
+  --emerald-700:           #050917;
+  --emerald-glow:          rgba(10, 18, 42, 0.32);
+  --emerald-glow-soft:     rgba(10, 18, 42, 0.14);
 
-  /* Geometry & Touch Targets */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-full: 9999px;
-  --touch-target: 48px;
+  --amber-300:             #FDE68A;
+  --amber-400:             #F59E0B;
+  --amber-500:             #D97706;
+  --amber-600:             #B45309;
+  --amber-glow:            rgba(245, 158, 11, 0.35);
+  --amber-glow-soft:       rgba(245, 158, 11, 0.18);
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --red-400:               #F87171;
+  --red-500:               #EF4444;
+  --red-glow:              rgba(239, 68, 68, 0.22);
+
+  --blue-400:              #60A5FA;
+  --blue-500:              #2563EB;
+  --blue-glow:             rgba(37, 99, 235, 0.22);
+
+  /* ── Primary Brand Gradients ─────────────────────────────── */
+  --brand-primary:         #0A122A;      /* Midnight Navy */
+  --brand-primary-dark:    #050917;
+  --brand-accent:          #1A2A57;
+  --brand-gradient:        linear-gradient(135deg, #0A122A 0%, #15234E 50%, #1F3472 100%);
+  --brand-gradient-warm:   linear-gradient(135deg, #0A122A 0%, #1F3472 60%, #FFF7E6 100%);
+  --brand-gradient-soft:   linear-gradient(135deg, #FFF7E6 0%, #F3E5C8 100%);
+  --brand-gradient-glow:   linear-gradient(135deg, rgba(10, 18, 42, 0.35) 0%, rgba(31, 52, 114, 0.20) 100%);
+  --brand-glow:            rgba(10, 18, 42, 0.35);
+
+  /* ── Semantic Colors ─────────────────────────────────────── */
+  --color-eat:             #0A122A;      /* Midnight Navy Eat confirmation */
+  --color-eat-subtle:      #1A2A57;
+  --color-eat-bg:          rgba(10, 18, 42, 0.06);
+  --color-eat-bg-hover:    rgba(10, 18, 42, 0.12);
+  --color-eat-border:      #0A122A;
+  --color-eat-glow:        rgba(10, 18, 42, 0.28);
+
+  --color-skip:            #36415C;
+  --color-skip-bg:         #FFFFFF;
+  --color-skip-border:     rgba(10, 18, 42, 0.25);
+
+  --color-warning:         #B45309;      /* Amber gold */
+  --color-warning-bg:      #FEF3C7;
+  --color-warning-border:  #F59E0B;
+
+  --color-danger:          #DC2626;
+  --color-danger-bg:       #FEE2E2;
+  --color-danger-border:   #EF4444;
+
+  --color-info:            #1F3472;
+  --color-info-bg:         rgba(31, 52, 114, 0.10);
+
+  /* ── Shadows (Rich Midnight Navy Elevation) ──────────────── */
+  --shadow-xs:   0 1px 2px rgba(10, 18, 42, 0.05);
+  --shadow-sm:   0 2px 8px rgba(10, 18, 42, 0.07), 0 1px 2px rgba(10, 18, 42, 0.04);
+  --shadow-md:   0 6px 20px rgba(10, 18, 42, 0.09), 0 2px 6px rgba(10, 18, 42, 0.04);
+  --shadow-lg:   0 14px 40px rgba(10, 18, 42, 0.12), 0 4px 12px rgba(10, 18, 42, 0.06);
+  --shadow-xl:   0 24px 64px rgba(10, 18, 42, 0.16), 0 8px 24px rgba(10, 18, 42, 0.08);
+  --shadow-glow-emerald: 0 0 0 2px var(--color-eat-border), 0 6px 24px rgba(10, 18, 42, 0.30);
+  --shadow-glow-amber:   0 0 0 2px var(--color-warning-border), 0 4px 18px rgba(245, 158, 11, 0.35);
+  --shadow-card: 0 1px 3px rgba(10, 18, 42, 0.06), 0 4px 18px rgba(10, 18, 42, 0.05);
+
+  /* ── Geometry ───────────────────────────────────────────── */
+  --radius-xs:    4px;
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --radius-xl:    20px;
+  --radius-2xl:   28px;
+  --radius-full:  9999px;
+  --touch-target: 44px;
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:     120ms;
+  --dur-base:     200ms;
+  --dur-slow:     350ms;
+  --transition-fast:   var(--dur-fast) var(--ease-smooth);
+  --transition-smooth: var(--dur-base) var(--ease-smooth);
+  --transition-spring: var(--dur-slow) var(--ease-spring);
+
+  /* ── Subtle Warm Grain ──────────────────────────────────── */
+  --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
-/* Dark Mode: Deep Espresso & Dark Chocolate */
+/* ── Light Mode Alignment (Light Vanilla & Midnight Navy) ──── */
+[data-theme="light"] {
+  --bg-base:               #F9EED4;
+  --bg-primary:            #FFF7E6;      /* Exact Light Vanilla */
+  --bg-secondary:          #F3E5C8;
+  --bg-surface:            #FFFFFF;      /* Pure white cards for maximum crispness */
+  --bg-surface-2:          #FFFDF9;
+  --bg-surface-3:          #F2E2C2;
+
+  --glass-bg:              rgba(255, 247, 230, 0.92);
+  --glass-bg-light:        rgba(255, 255, 255, 0.88);
+  --glass-border:          rgba(10, 18, 42, 0.10);
+  --glass-border-hover:    rgba(10, 18, 42, 0.22);
+
+  --border-subtle:         rgba(10, 18, 42, 0.08);
+  --border-default:        rgba(10, 18, 42, 0.15);
+  --border-strong:         rgba(10, 18, 42, 0.32);
+
+  --text-primary:          #0A122A;      /* Exact Midnight Navy */
+  --text-secondary:        #36415C;
+  --text-muted:            #687492;
+  --text-inverse:          #FFF7E6;      /* Exact Light Vanilla */
+
+  --shadow-xs:   0 1px 2px rgba(10, 18, 42, 0.05);
+  --shadow-sm:   0 2px 8px rgba(10, 18, 42, 0.07);
+  --shadow-md:   0 6px 20px rgba(10, 18, 42, 0.09);
+  --shadow-lg:   0 14px 40px rgba(10, 18, 42, 0.12);
+  --shadow-xl:   0 24px 64px rgba(10, 18, 42, 0.16);
+  --shadow-card: 0 1px 3px rgba(10, 18, 42, 0.06), 0 4px 18px rgba(10, 18, 42, 0.05);
+
+  --color-eat:             #0A122A;
+  --color-eat-subtle:      #1A2A57;
+  --color-eat-bg:          rgba(10, 18, 42, 0.06);
+  --color-eat-bg-hover:    rgba(10, 18, 42, 0.12);
+  --color-eat-border:      #0A122A;
+  --emerald-glow:          rgba(10, 18, 42, 0.28);
+}
+
+/* ── Luxurious Midnight Navy Velvet Dark Mode ─────────────── */
 [data-theme="dark"] {
-  --bg-primary: #15110e;          /* Dark roast coffee bean */
-  --bg-secondary: #1e1915;        /* Deep espresso background */
-  --bg-surface: #27211c;          /* Warm cocoa card surface */
-  --bg-surface-elevated: #332b25; /* Elevated cocoa pod */
-  --bg-glass: rgba(30, 24, 20, 0.88);
-  --border-color: #3d342d;
-  --border-subtle: #302923;
-  --border-focus: #c47c2b;
+  --bg-base:               #050917;      /* Deepest midnight void */
+  --bg-primary:            #0A122A;      /* Exact Midnight Navy canvas */
+  --bg-secondary:          #111D3E;      /* Secondary navy container */
+  --bg-surface:            #172752;      /* Elevated velvet navy card */
+  --bg-surface-2:          #1F3369;      /* Interactive elevated panel */
+  --bg-surface-3:          #2A4384;      /* Highlighted navy */
 
-  --text-primary: #f6f1ea;        /* Pale oat milk cream */
-  --text-secondary: #c2b5a6;      /* Toasted hazelnut */
-  --text-muted: #8c7e71;          /* Warm shadow */
-  --text-inverse: #1c1612;
+  --glass-bg:              rgba(23, 39, 82, 0.88);
+  --glass-bg-light:        rgba(17, 29, 62, 0.70);
+  --glass-border:          rgba(255, 247, 230, 0.15);
+  --glass-border-hover:    rgba(255, 247, 230, 0.30);
 
-  --brand-primary: #c47c2b;       /* Warm roasted caramel in dark */
-  --brand-hover: #dc8c33;
-  --brand-accent: #e59846;
-  --brand-gradient: linear-gradient(135deg, #a75d22 0%, #c47c2b 100%);
-  --brand-glow: rgba(196, 124, 43, 0.25);
+  --border-subtle:         rgba(255, 247, 230, 0.08);
+  --border-default:        rgba(255, 247, 230, 0.18);
+  --border-strong:         rgba(255, 247, 230, 0.32);
 
-  --color-eat: #48a876;
-  --color-eat-bg: rgba(72, 168, 118, 0.16);
-  --color-eat-border: rgba(72, 168, 118, 0.35);
+  --text-primary:          #FFF7E6;      /* Exact Light Vanilla */
+  --text-secondary:        #D8CFBC;      /* Warm Vanilla Slate */
+  --text-muted:            #9FA7BC;      /* Dusty Navy */
+  --text-inverse:          #0A122A;
 
-  --color-skip: #998c7e;
-  --color-skip-bg: rgba(153, 140, 126, 0.15);
-  --color-skip-border: rgba(153, 140, 126, 0.3);
+  --line-navy:             linear-gradient(90deg, transparent, rgba(255, 247, 230, 0.40) 20%, #FFF7E6 50%, rgba(255, 247, 230, 0.40) 80%, transparent 100%);
+  --line-navy-solid:       linear-gradient(90deg, #111D3E 0%, #1F3369 50%, #FFF7E6 100%);
 
-  --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --brand-primary:         #FFF7E6;      /* Vanilla pops on dark navy */
+  --brand-primary-dark:    #F3E5C8;
+  --brand-accent:          #3B5DA8;
+  --brand-gradient:        linear-gradient(135deg, #172752 0%, #2A4384 55%, #FFF7E6 100%);
+  --brand-gradient-warm:   linear-gradient(135deg, #0A122A 0%, #1F3369 60%, #FFF7E6 100%);
 
-  --color-danger: #ef5350;
-  --color-danger-bg: rgba(239, 83, 80, 0.16);
+  --color-eat:             #FFF7E6;      /* Light Vanilla */
+  --color-eat-subtle:      #F3E5C8;
+  --color-eat-bg:          rgba(255, 247, 230, 0.12);
+  --color-eat-bg-hover:    rgba(255, 247, 230, 0.20);
+  --color-eat-border:      rgba(255, 247, 230, 0.35);
+  --color-eat-glow:        rgba(255, 247, 230, 0.25);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.45);
+  --color-skip:            #9FA7BC;
+  --color-skip-bg:         rgba(255, 247, 230, 0.08);
+  --color-skip-border:     rgba(255, 247, 230, 0.20);
+
+  --color-warning:         #FDE68A;
+  --color-warning-bg:      rgba(253, 230, 138, 0.12);
+  --color-warning-border:  rgba(253, 230, 138, 0.28);
+
+  --color-danger:          #FCA5A5;
+  --color-danger-bg:       rgba(252, 165, 165, 0.12);
+  --color-danger-border:   rgba(252, 165, 165, 0.28);
+
+  --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm:   0 2px 8px rgba(0, 0, 0, 0.40);
+  --shadow-md:   0 4px 18px rgba(0, 0, 0, 0.45);
+  --shadow-lg:   0 12px 36px rgba(0, 0, 0, 0.55);
+  --shadow-xl:   0 22px 54px rgba(0, 0, 0, 0.65);
+  --shadow-card: 0 1px 0 var(--glass-border), 0 4px 20px rgba(0, 0, 0, 0.40);
+  --emerald-glow:          rgba(255, 247, 230, 0.22);
 }
