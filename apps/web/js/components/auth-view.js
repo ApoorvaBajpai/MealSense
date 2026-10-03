@@ -1,12 +1,13 @@
 /**
- * MealSense Production Authentication View
- * PM Upgrade Version 2.0
+ * MealSense Authentication View Component: PM & Technical Specification V2.0
  * 
- * Implements Section 19:
- * - Role-Based Demo Entry: "Explore as Student", "Explore as Kitchen Staff", "Explore as Administrator"
- * - Prominent "Start 60-Sec Guided Walkthrough"
- * - Clear Demo-Data Disclosure Badge
- * - Clean Slate for Real User Registrations
+ * Features:
+ * - Clear distinction: DEMO MODE (seeded experience) vs LIVE MODE (clean operational state)
+ * - 60-Second Guided PM Evaluator Tour launcher
+ * - Dedicated demo identities for Student, Kitchen Staff, and Administrator
+ * - Deep link evaluator guide (?mode=demo&role=student|kitchen|admin or ?tour=true)
+ * - Honestly labeled "Prototype Authentication (Local Storage & SHA-256)"
+ * - Clean slate registration for authentic live deployment testing
  */
 
 import { authService } from '../auth.js';
@@ -20,7 +21,7 @@ export function renderAuthView(container) {
 
   function update() {
     container.innerHTML = `
-      <div class="auth-container" style="max-width: 540px; margin: 0 auto; padding: 20px 14px;">
+      <div class="auth-container" style="max-width: 560px; margin: 0 auto; padding: 20px 14px;">
         <!-- Brand Header -->
         <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 20px; text-align: center;">
           <div class="brand-icon" style="width: 56px; height: 56px; font-size: 2rem;">🍽️</div>
@@ -28,90 +29,113 @@ export function renderAuthView(container) {
             MealSense
           </h1>
           <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 440px; line-height: 1.4; margin: 0;">
-            Institutional Dining & Food Waste Prevention Platform
+            Institutional Dining & Food-Waste Prevention Platform
           </p>
           <div style="font-size: 0.78rem; font-weight: 600; color: var(--brand-primary); margin-top: 2px;">
-            Closed Loop: Student Intent → Conformal Forecast → Kitchen Prep Decision → Waste Audit
+            Student Intent → Demand Forecast → Kitchen Decision → Waste Audit → Continuous Insights
           </div>
         </div>
 
-        <!-- Section 19.2: Guided 60-Second PM Evaluator Tour CTA Card -->
-        <div class="card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(184, 93, 56, 0.08) 100%); border: 2px solid var(--brand-accent); padding: 18px; margin-bottom: 22px; text-align: center;">
-          <div style="font-size: 0.76rem; font-weight: 800; text-transform: uppercase; color: var(--brand-primary); letter-spacing: 0.05em; margin-bottom: 4px;">
-            ⭐ Product Management Case Study Experience
+        <!-- Section 3.1 & 17.1: Guided 60-Second PM Evaluator Tour CTA Card -->
+        <div class="card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(184, 93, 56, 0.08) 100%); border: 2px solid var(--brand-accent); padding: 18px; margin-bottom: 20px; text-align: center;">
+          <div style="font-size: 0.74rem; font-weight: 800; text-transform: uppercase; color: var(--brand-primary); letter-spacing: 0.05em; margin-bottom: 4px;">
+            ⭐ Product Management Evaluator Experience
           </div>
           <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
             60-Second Closed-Loop Guided Tour
           </h3>
           <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 14px auto; line-height: 1.4;">
-            Walk through all 5 stages of the product loop across Student, Kitchen, and Admin perspectives with guided step explanations.
+            Experience the complete 5-stage product loop across Student, Kitchen, and Admin perspectives with guided walkthrough prompts.
           </p>
           <button id="btn-start-guided-tour" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem; font-weight: 700;">
             🚀 Start 60-Second Guided Tour
           </button>
         </div>
 
-        <!-- Section 19.1: Role-Based Demo Entry Hub -->
-        <div class="card" style="margin-bottom: 22px; padding: 20px;">
+        <!-- Section 3: First-Class Demo Mode Entry Hub -->
+        <div class="card" style="margin-bottom: 20px; padding: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">
-              💡 Explore by Role (Demo Sandbox):
+              ✨ First-Class Demo Mode (Seeded Sandbox)
             </div>
-            <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Preloaded Data</span>
+            <span class="badge badge-eat" style="font-size: 0.68rem;">Ready-to-Explore</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
+            Explore with preloaded operational data: 7+ days of meals, baseline comparison, telemetry events, and simulated A/B tests without manual setup.
+          </p>
+
+          <button id="btn-explore-demo-direct" type="button" class="btn btn-primary" style="width: 100%; padding: 11px; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+            ✨ Explore Demo Mode
+          </button>
+
+          <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.04em;">
+            Or choose a specific demo perspective:
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <!-- Student Demo Card -->
-            <button class="btn-demo-quick" data-demo-id="student_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
+            <button type="button" class="btn-demo-quick" data-demo-id="student_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="font-size: 1.5rem;">🎓</span>
                 <div>
                   <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Student</div>
-                  <div style="font-size: 0.76rem; color: var(--text-muted);">Aarav Sharma • 1-Tap Eat/Skip Intent & My Impact</div>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">Aarav Sharma • One-tap intent & data-derived My Impact</div>
                 </div>
               </div>
               <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
             </button>
 
             <!-- Kitchen Demo Card -->
-            <button class="btn-demo-quick" data-demo-id="staff_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
+            <button type="button" class="btn-demo-quick" data-demo-id="staff_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="font-size: 1.5rem;">👨‍🍳</span>
                 <div>
                   <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Kitchen Staff</div>
-                  <div style="font-size: 0.76rem; color: var(--text-muted);">Chef Rajesh • Decision-First Recommendation & Overrides</div>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">Chef Rajesh • Service forecast snapshot, overrides & outcome loop</div>
                 </div>
               </div>
               <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
             </button>
 
             <!-- Admin Demo Card -->
-            <button class="btn-demo-quick" data-demo-id="admin_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
+            <button type="button" class="btn-demo-quick" data-demo-id="admin_testid" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: all 0.2s ease;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="font-size: 1.5rem;">🏛️</span>
                 <div>
                   <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">Explore as Administrator</div>
-                  <div style="font-size: 0.76rem; color: var(--text-muted);">Dr. V. K. Verma • Baseline Impact, Insights & SaaS ROI</div>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">Dr. V. K. Verma • Executive metrics, trends, funnels & reports</div>
                 </div>
               </div>
               <span style="font-size: 0.82rem; color: var(--brand-primary); font-weight: 700;">Launch →</span>
             </button>
           </div>
 
-          <!-- Section 19.3: Demo-Data Disclosure Badge -->
+          <!-- Deep link hint -->
           <div style="background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 14px; border: 1px solid var(--border-subtle); font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
-            ⚠️ <strong>Demo Environment Disclosure:</strong> Preloaded with sample evaluative data for demonstration. Real-world institutional deployments measure actual facility baselines.
+            🔗 <strong>Evaluator Deep Links:</strong> Use <code>?mode=demo&role=student</code>, <code>?mode=demo&role=kitchen</code>, <code>?mode=demo&role=admin</code>, or <code>?tour=true</code> for direct role access.
           </div>
         </div>
 
-        <!-- Custom Account Sign-in / Registration Card -->
+        <!-- Section 16: Authentication Card (Prototype Authentication) -->
         <div class="auth-card">
+          <div style="margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+                Prototype Authentication
+              </span>
+              <span class="badge" style="font-size: 0.66rem; background: var(--bg-secondary);">Local SHA-256</span>
+            </div>
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+              Client-side authentication prototype. In production, identity is managed via OAuth/SAML SSO with server-side JWT and Row-Level Security (RLS).
+            </div>
+          </div>
+
           <div class="auth-tabs">
             <button id="tab-login" class="auth-tab-btn ${activeTab === 'login' ? 'active' : ''}">
-              Sign In with Account
+              Sign In to Account
             </button>
             <button id="tab-signup" class="auth-tab-btn ${activeTab === 'signup' ? 'active' : ''}">
-              Register Clean Slate
+              Register Clean Slate (Live Mode)
             </button>
           </div>
 
@@ -150,6 +174,9 @@ export function renderAuthView(container) {
   function renderSignupForm(role) {
     return `
       <form id="form-signup" autocomplete="off">
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+          ℹ️ <strong>Live Mode Guarantee:</strong> Registering creates a clean operational state with zero seeded meals or fake KPIs.
+        </div>
         <label class="form-label" style="margin-bottom: 8px; display: block;">Select Role</label>
         <div class="role-selector-grid">
           <div class="role-option-card ${role === 'student' ? 'selected' : ''}" data-role="student">
@@ -183,7 +210,7 @@ export function renderAuthView(container) {
           <input type="password" id="reg-password" class="form-input" placeholder="Choose a password" required minlength="4">
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-          Register Clean Slate Account
+          Register Clean Slate (Live Mode)
         </button>
       </form>
     `;
@@ -206,6 +233,22 @@ export function renderAuthView(container) {
       tabSignup.onclick = () => { activeTab = 'signup'; errorMessage = ''; update(); };
     }
 
+    // Direct Explore Demo button
+    const btnExploreDirect = container.querySelector('#btn-explore-demo-direct');
+    if (btnExploreDirect) {
+      btnExploreDirect.onclick = async () => {
+        try {
+          await store.switchToDemo('student');
+          tracker.track('auth.login_completed', { role: 'student', is_demo: true });
+          window.showToast('Launched Demo Mode (Student Experience)', 'success');
+        } catch (e) {
+          console.error('Demo launch error', e);
+          errorMessage = e.message;
+          update();
+        }
+      };
+    }
+
     // Quick demo buttons
     container.querySelectorAll('.btn-demo-quick').forEach(btn => {
       btn.onclick = async () => {
@@ -213,8 +256,9 @@ export function renderAuthView(container) {
         try {
           await store.login(demoId, 'demo');
           tracker.track('auth.login_completed', { role: store.currentUser.role, is_demo: true });
-          window.showToast(`Logged in as ${store.currentUser.name}`, 'success');
+          window.showToast(`Logged in as ${store.currentUser.name} (Demo Mode)`, 'success');
         } catch (e) {
+          console.error('Demo login error', e);
           errorMessage = e.message;
           update();
         }
@@ -230,7 +274,7 @@ export function renderAuthView(container) {
         const pass = document.getElementById('login-password').value;
         try {
           await store.login(id, pass);
-          tracker.track('auth.login_completed', { role: store.currentUser.role, is_demo: false });
+          tracker.track('auth.login_completed', { role: store.currentUser.role, is_demo: store.isDemo });
           window.showToast(`Welcome back, ${store.currentUser.name}!`, 'success');
         } catch (err) {
           errorMessage = err.message;
@@ -260,7 +304,7 @@ export function renderAuthView(container) {
         try {
           await store.signup({ name, email, password, role: selectedRole, hostelName });
           tracker.track('auth.signup_completed', { role: selectedRole });
-          window.showToast('Account registered successfully with clean operational state!', 'success');
+          window.showToast('Account registered successfully in Live Mode with clean operational state!', 'success');
         } catch (err) {
           errorMessage = err.message;
           update();

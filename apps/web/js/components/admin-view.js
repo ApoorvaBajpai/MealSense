@@ -1,29 +1,29 @@
 /**
- * Admin Dashboard View Component: PM Upgrade Version 2.0
+ * Admin Dashboard View Component: PM & Technical Specification V2.0
  * 
  * Features:
- * - Section 12: Executive-Friendly Overview (North Star: Avoidable Waste/Meal, Guardrail: Shortage Rate)
- * - Section 5 & 6: Baseline Comparison & "Estimated Savings vs Baseline" Methodology
- * - Section 12.2: Interactive 7d / 30d / 90d Trends Selector
- * - Section 12.3 & 13: Deterministic Insights & Menu Intelligence with Small-Sample Suppression
- * - Section 14, 15, 16: Product Analytics, Funnels & Live A/B Experiments
- * - Section 18: Interactive Institutional SaaS ROI Calculator
- * - Section 24: Human-Readable Monthly Mess Audit Report (Print/PDF preview & CSV export)
+ * - One product, two data modes: Full Demo Mode vs Clean Live Empty State
+ * - Executive Overview with dynamic metrics from MetricEngine
+ * - Baseline Comparison with defensible savings formulas
+ * - Dynamic 7d / 30d / 90d Trends from TrendEngine
+ * - Dynamic Deterministic Insights with N < 5 Small-Group Privacy Suppression
+ * - Dynamic Conversion Funnels from FunnelEngine
+ * - Experiments Register with explicit "Simulated Demo Benchmark" labeling
+ * - Institutional SaaS ROI Calculator (Scenario Estimate)
+ * - Monthly Mess Report with provenance and CSV export
  */
 
-import { store, TREND_DATASETS } from '../store.js';
+import { store } from '../store.js';
 import { api } from '../api.js';
 import { authService } from '../auth.js';
-import { tracker } from '../analytics.js';
 
 let currentAdminTab = 'overview'; // 'overview' | 'insights' | 'analytics' | 'roi' | 'governance'
 
 export function renderAdminView(container) {
-  const isDemo = Boolean(store.currentUser && store.currentUser.isDemo);
+  const isDemo = Boolean(store.isDemo);
   const facility = store.facility;
   const metrics = store.getMetricsSummary();
   const tf = store.selectedTimeframe || '30d';
-  const trendData = TREND_DATASETS[tf];
 
   // Roster Accounts
   const DEMO_EVALUATION_ROSTER = [
@@ -42,6 +42,76 @@ export function renderAdminView(container) {
   const accounts = isDemo ? DEMO_EVALUATION_ROSTER : realAccounts;
   const students = accounts.filter(a => a.role === 'student');
 
+  // If in Live mode and there are zero meals or no operational data recorded yet,
+  // show the Clean Live Empty State per Section 4.3 of the Technical Specification.
+  if (!isDemo && !metrics.hasData) {
+    container.innerHTML = `
+      <div class="admin-container">
+        <!-- Executive Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;">
+                🏛️ ${facility.name || 'Institutional Mess'}
+              </h2>
+              <span class="badge badge-warning" style="font-size: 0.72rem;">
+                Live Mode • Awaiting First Records
+              </span>
+            </div>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+              Production Operational State • No seeded data
+            </span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-empty-setup-fac" class="btn btn-secondary btn-sm">
+              ⚙️ Facility Setup
+            </button>
+            <button id="btn-empty-explore-demo" class="btn btn-primary btn-sm">
+              ✨ Explore Demo Mode
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State Card -->
+        <div class="card" style="text-align: center; padding: 64px 24px; border: 1px dashed var(--border-color);">
+          <div style="font-size: 3.2rem; margin-bottom: 16px;">🏛️</div>
+          <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+            No operational data yet
+          </h3>
+          <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 24px; font-size: 0.92rem; line-height: 1.6;">
+            MealSense will populate this dashboard once meals, student intent responses, and kitchen post-meal outcomes are recorded.
+          </p>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <button id="btn-empty-setup-fac-2" class="btn btn-primary">
+              ⚙️ Set Up Facility
+            </button>
+            <button id="btn-empty-explore-demo-2" class="btn btn-secondary">
+              ✨ Explore Demo Mode
+            </button>
+          </div>
+          <div style="margin-top: 32px; font-size: 0.78rem; color: var(--text-muted);">
+            <em>Data Integrity Guarantee:</em> Live mode strictly displays real records and will never render seeded demo KPIs or simulated charts.
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.querySelector('#btn-empty-setup-fac')?.addEventListener('click', () => openFacilityEditModal());
+    container.querySelector('#btn-empty-setup-fac-2')?.addEventListener('click', () => openFacilityEditModal());
+    container.querySelector('#btn-empty-explore-demo')?.addEventListener('click', () => store.switchToDemo('admin'));
+    container.querySelector('#btn-empty-explore-demo-2')?.addEventListener('click', () => store.switchToDemo('admin'));
+    return;
+  }
+
+  const baselineComp = store.getBaselineComparison();
+  const trendWaste = store.getTrendSeries('wastePerMeal');
+  const trendMae = store.getTrendSeries('forecastMae');
+  const trendResp = store.getTrendSeries('responseRate');
+  const insights = store.getInsights();
+  const studentFunnel = store.getStudentFunnel();
+  const kitchenFunnel = store.getKitchenFunnel();
+  const experiments = store.experiments;
+
   const html = `
     <div class="admin-container">
       <!-- Executive Header -->
@@ -51,8 +121,8 @@ export function renderAdminView(container) {
             <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;">
               🏛️ ${facility.name}
             </h2>
-            <span class="badge ${isDemo ? 'badge-eat' : 'badge-warning'}" style="font-size: 0.72rem;">
-              ${isDemo ? 'Demo Evaluator Sandbox' : 'Live Institutional Deployment'}
+            <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.72rem;">
+              ${isDemo ? 'Demo Evaluator Sandbox • Sample Data' : 'Live Institutional Deployment • Real Records'}
             </span>
           </div>
           <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
@@ -78,10 +148,10 @@ export function renderAdminView(container) {
           📊 Executive Impact & Trends
         </button>
         <button class="kitchen-tab-btn ${currentAdminTab === 'insights' ? 'active' : ''}" data-admin-tab="insights">
-          💡 Deterministic Insights
+          💡 Deterministic Insights (${insights.length})
         </button>
         <button class="kitchen-tab-btn ${currentAdminTab === 'analytics' ? 'active' : ''}" data-admin-tab="analytics">
-          📈 Analytics, Funnels & A/B Tests
+          📈 Analytics, Funnels & Experiments
         </button>
         <button class="kitchen-tab-btn ${currentAdminTab === 'roi' ? 'active' : ''}" data-admin-tab="roi">
           💰 Institutional SaaS ROI Calculator
@@ -91,7 +161,22 @@ export function renderAdminView(container) {
         </button>
       </div>
 
-      ${renderActiveTabContent(currentAdminTab, { facility, metrics, tf, trendData, accounts, students, isDemo })}
+      ${renderActiveTabContent(currentAdminTab, {
+        facility,
+        metrics,
+        baselineComp,
+        tf,
+        trendWaste,
+        trendMae,
+        trendResp,
+        insights,
+        studentFunnel,
+        kitchenFunnel,
+        experiments,
+        accounts,
+        students,
+        isDemo
+      })}
     </div>
   `;
 
@@ -111,71 +196,100 @@ function renderActiveTabContent(tab, data) {
 }
 
 // ---------------- TAB 1: EXECUTIVE OVERVIEW & TRENDS ----------------
-function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
+function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, trendMae, trendResp, isDemo }) {
+  const isWasteReduced = metrics.wasteReductionPct > 0;
+  const isOverprepReduced = metrics.overproductionReductionPct > 0;
+
   return `
     <div>
-      <!-- Section 12.1: Executive KPI Grid -->
+      <!-- Section 8.1 & 12.1: Executive KPI Grid -->
       <div class="kpi-grid" style="margin-bottom: 24px;">
         <!-- North Star Metric -->
         <div class="kpi-card" style="border-top: 4px solid var(--color-eat); background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(46, 107, 72, 0.05) 100%);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <span class="kpi-label">⭐ North Star Metric: Avoidable Waste</span>
-            <span class="badge badge-eat" style="font-size: 0.7rem;">Target: ≤ 0.17 kg</span>
+            <span class="kpi-label">⭐ North Star: Avoidable Waste / Meal</span>
+            <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.68rem;">
+              ${isDemo ? 'Demo Metric' : 'Live Metric'}
+            </span>
           </div>
           <div class="kpi-value" style="color: var(--color-eat);">
             ${metrics.wastePerMealKg} <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">kg / meal</span>
           </div>
-          <span class="kpi-delta delta-good">
-            ↓ ${metrics.wasteReductionPct}% vs Pre-Implementation Baseline (${metrics.baselineWasteKg} kg)
+          <span class="kpi-delta ${isWasteReduced ? 'delta-good' : 'delta-bad'}">
+            ${isWasteReduced ? '↓' : '↑'} ${Math.abs(metrics.wasteReductionPct)}% vs Baseline (${metrics.baselineWasteKg} kg)
           </span>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
+            Provenance: Calculated from ${isDemo ? 'demo seed' : 'logged outcomes'}
+          </div>
         </div>
 
         <!-- Overproduction Rate -->
         <div class="kpi-card">
-          <span class="kpi-label">Kitchen Overproduction Rate</span>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <span class="kpi-label">Kitchen Overproduction Rate</span>
+            <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Target: &lt; 5%</span>
+          </div>
           <div class="kpi-value">${metrics.overproductionRate}%</div>
-          <span class="kpi-delta delta-good">
-            ↓ ${metrics.overproductionReductionPct}% vs Baseline (${metrics.baselineOverproductionRate}%)
+          <span class="kpi-delta ${isOverprepReduced ? 'delta-good' : 'delta-bad'}">
+            ${isOverprepReduced ? '↓' : '↑'} ${Math.abs(metrics.overproductionReductionPct)}% vs Baseline (${metrics.baselineOverproductionRate}%)
           </span>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
+            Provenance: Derived from (prepared - actual diners) / prepared
+          </div>
         </div>
 
         <!-- Forecast MAE -->
         <div class="kpi-card">
-          <span class="kpi-label">Forecast Accuracy (MAE)</span>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <span class="kpi-label">Forecast Error (MAE)</span>
+            <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Accuracy</span>
+          </div>
           <div class="kpi-value">${metrics.forecastMae} <span style="font-size: 0.9rem; color: var(--text-muted);">heads</span></div>
           <span class="kpi-delta delta-good">
             ↓ ${metrics.maeReductionPct}% error reduction vs baseline
           </span>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
+            Provenance: Mean |prediction - actual| across recorded meals
+          </div>
         </div>
 
         <!-- Non-Negotiable Guardrail -->
         <div class="kpi-card" style="border-top: 4px solid ${metrics.shortageRate <= 0.5 ? 'var(--color-eat)' : 'var(--color-danger)'};">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <span class="kpi-label">🛡️ Guardrail: Shortage Rate</span>
-            <span class="badge ${metrics.shortageRate <= 0.5 ? 'badge-eat' : 'badge-warning'}" style="font-size: 0.7rem;">Limit: < 0.5%</span>
+            <span class="badge ${metrics.shortageRate <= 0.5 ? 'badge-eat' : 'badge-danger'}" style="font-size: 0.68rem;">Limit: &lt; 0.5%</span>
           </div>
           <div class="kpi-value" style="color: ${metrics.shortageRate <= 0.5 ? 'var(--color-eat)' : 'var(--color-danger)'};">
             ${metrics.shortageRate}%
           </div>
-          <span class="kpi-delta delta-good">
-            ✓ Zero shortages recorded this month
+          <span class="kpi-delta ${metrics.shortageRate <= 0.5 ? 'delta-good' : 'delta-bad'}">
+            ${metrics.shortageRate === 0 ? '✓ Zero shortages recorded in period' : '⚠️ Shortage events logged'}
           </span>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
+            Provenance: Shortage occurrences / completed services
+          </div>
         </div>
 
         <!-- On-Time Intent Participation -->
         <div class="kpi-card">
-          <span class="kpi-label">Student On-Time Response Rate</span>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <span class="kpi-label">Student On-Time Response</span>
+            <span class="badge badge-eat" style="font-size: 0.68rem;">Signal</span>
+          </div>
           <div class="kpi-value">${metrics.onTimeResponseRate}%</div>
           <span class="kpi-delta delta-good">
-            ↑ from 24.5% baseline (+53.0 pp)
+            ↑ ${metrics.responseRateDelta >= 0 ? '+' : ''}${metrics.responseRateDelta} pp vs baseline (${metrics.baselineResponseRate}%)
           </span>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
+            Provenance: On-time student responses / eligible dining count
+          </div>
         </div>
 
         <!-- Estimated Savings vs Baseline -->
         <div class="kpi-card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(184, 93, 56, 0.05) 100%);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <span class="kpi-label">Estimated Savings vs Baseline*</span>
-            <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Defensible Est.</span>
+            <span class="kpi-label">Estimated Savings vs Baseline</span>
+            <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Scenario Estimate</span>
           </div>
           <div class="kpi-value" style="color: var(--brand-primary);">
             ₹${metrics.estimatedMonthlySavings.toLocaleString('en-IN')}
@@ -183,10 +297,13 @@ function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
           <span class="kpi-delta delta-good">
             ₹${facility.costPerServing}/serving avoided overprep
           </span>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
+            Provenance: (Baseline % - Current %) × Cooked Servings × ₹${facility.costPerServing}
+          </div>
         </div>
       </div>
 
-      <!-- Section 6: Baseline vs Current Like-for-Like Comparison Table -->
+      <!-- Section 8.3 & 6: Baseline vs Current Like-for-Like Comparison Table -->
       <div class="card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
           <div>
@@ -194,11 +311,11 @@ function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
               📊 Like-for-Like Operational Impact: Baseline vs. Current
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
-              Comparing pre-implementation audit period (August 2026) against live MealSense operations (September 2026)
+              Comparing pre-implementation reference period (Aug 1–31, 2026) against active ${isDemo ? 'demo operations' : 'live facility records'}
             </span>
           </div>
           <span class="badge badge-eat" style="font-size: 0.74rem;">
-            Sample Size: 12,420 Meals Evaluated
+            Sample Size: ${metrics.sampleCount} Meals Evaluated
           </span>
         </div>
 
@@ -207,64 +324,35 @@ function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
             <thead>
               <tr>
                 <th>Operational Metric</th>
-                <th>Baseline (Pre-MealSense)</th>
-                <th>Current (With MealSense)</th>
+                <th>Baseline (Pre-Implementation)</th>
+                <th>Current Period</th>
                 <th>Measured Change (Δ)</th>
-                <th>Audit Status</th>
+                <th>Provenance & Classification</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><strong>Avoidable Food Waste per Meal</strong></td>
-                <td>0.230 kg / meal</td>
-                <td><strong>0.180 kg / meal</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">↓ 21.7% (-0.050 kg)</span></td>
-                <td><span class="badge badge-eat">Verified North Star</span></td>
-              </tr>
-              <tr>
-                <td><strong>Kitchen Overproduction Rate</strong></td>
-                <td>6.10% excess prep</td>
-                <td><strong>4.20% excess prep</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">↓ 31.1% (-1.90 pp)</span></td>
-                <td><span class="badge badge-eat">Verified Cook Reduction</span></td>
-              </tr>
-              <tr>
-                <td><strong>Student On-Time Response Rate</strong></td>
-                <td>24.5% unprompted</td>
-                <td><strong>77.5% intent rate</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">↑ 216% (+53.0 pp)</span></td>
-                <td><span class="badge badge-eat">Observed Correlation</span></td>
-              </tr>
-              <tr>
-                <td><strong>Forecast Error (MAE)</strong></td>
-                <td>8.6 heads error</td>
-                <td><strong>7.1 heads error</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">↓ 17.4% (-1.5 heads)</span></td>
-                <td><span class="badge badge-eat">Walk-Forward Backtested</span></td>
-              </tr>
-              <tr>
-                <td><strong>Shortage Rate (Guardrail)</strong></td>
-                <td>0.40% meals</td>
-                <td><strong>0.00% meals</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">-0.40 pp (0 shortages)</span></td>
-                <td><span class="badge badge-eat">✓ Guardrail Maintained</span></td>
-              </tr>
-              <tr style="background: rgba(184, 93, 56, 0.04);">
-                <td><strong>Estimated Monthly Operational Savings</strong></td>
-                <td>₹0 (Baseline)</td>
-                <td><strong>₹${metrics.estimatedMonthlySavings.toLocaleString('en-IN')} / mo</strong></td>
-                <td><span style="color: var(--brand-primary); font-weight: 800;">+₹${metrics.estimatedMonthlySavings.toLocaleString('en-IN')} net</span></td>
-                <td><span class="badge" style="background: var(--bg-surface); border: 1px solid var(--border-color);">Audited Methodology*</span></td>
-              </tr>
+              ${baselineComp.metrics.map(row => `
+                <tr ${row.key === 'estimatedSavings' ? 'style="background: rgba(184, 93, 56, 0.04); font-weight: 600;"' : ''}>
+                  <td><strong>${row.name}</strong></td>
+                  <td>${row.baseline}</td>
+                  <td><strong>${row.current}</strong></td>
+                  <td>
+                    <span style="color: ${row.isGood ? 'var(--color-eat)' : 'var(--text-primary)'}; font-weight: 700;">
+                      ${row.delta}
+                    </span>
+                  </td>
+                  <td><span class="badge ${row.key === 'estimatedSavings' ? 'badge-warning' : 'badge-eat'}" style="font-size: 0.7rem;">${row.statusLabel}</span></td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
         <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">
-          *<em>Correlation vs. Causation Disclosure:</em> Observed increases in student response rate correlate strongly with reduced preparation variance ($r = 0.79$). Avoidable cost savings are calculated as overproduction servings avoided multiplied by raw food cost per portion (₹42.00).
+          *<em>Methodology & Disclosure:</em> All figures are derived dynamically from the active data provider (${isDemo ? 'demo seed records' : 'live operational records'}). Avoidable cost savings represent scenario estimates calculated from overproduction servings avoided multiplied by raw food portion cost (₹${facility.costPerServing.toFixed(2)}).
         </div>
       </div>
 
-      <!-- Section 12.2: Operational Trends (7d / 30d / 90d) -->
+      <!-- Section 7: Operational Trends Derived from Raw Records -->
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
           <div>
@@ -272,7 +360,7 @@ function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
               📈 Operational Trends & Trajectory
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
-              Visualize trajectory for food waste, forecast accuracy, and student engagement
+              ${isDemo ? 'Example operational trend • Sample data' : 'Operational trend • Derived from logged meal outcomes'}
             </span>
           </div>
           <!-- Timeframe Selector -->
@@ -289,27 +377,36 @@ function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
           <div style="background: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Avoidable Waste (kg/meal)</span>
-              <span style="font-size: 0.78rem; color: var(--color-eat); font-weight: 700;">↓ Declining</span>
+              <span style="font-size: 0.74rem; color: var(--color-eat); font-weight: 700;">${trendWaste.statusLabel}</span>
             </div>
-            ${renderMiniBarChart(trendData.labels, trendData.wastePerMeal, 'kg', 'var(--color-eat)')}
+            ${trendWaste.hasData 
+              ? renderMiniBarChart(trendWaste.labels, trendWaste.values, 'kg', 'var(--color-eat)')
+              : `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem;">Not enough data yet for ${tf} trend</div>`
+            }
           </div>
 
           <!-- Chart 2: Forecast Error MAE Trend -->
           <div style="background: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Forecast MAE (Error in Heads)</span>
-              <span style="font-size: 0.78rem; color: var(--brand-primary); font-weight: 700;">↓ Calibrating</span>
+              <span style="font-size: 0.74rem; color: var(--brand-primary); font-weight: 700;">${trendMae.statusLabel}</span>
             </div>
-            ${renderMiniBarChart(trendData.labels, trendData.forecastMae, 'heads', 'var(--brand-primary)')}
+            ${trendMae.hasData 
+              ? renderMiniBarChart(trendMae.labels, trendMae.values, 'heads', 'var(--brand-primary)')
+              : `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem;">Not enough data yet for ${tf} trend</div>`
+            }
           </div>
 
           <!-- Chart 3: Student Response Rate Trend -->
           <div style="background: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">On-Time Student Intent Rate</span>
-              <span style="font-size: 0.78rem; color: var(--color-eat); font-weight: 700;">↑ 77.5%</span>
+              <span style="font-size: 0.74rem; color: var(--brand-accent); font-weight: 700;">${trendResp.statusLabel}</span>
             </div>
-            ${renderMiniBarChart(trendData.labels, trendData.responseRate, '%', 'var(--brand-accent)')}
+            ${trendResp.hasData 
+              ? renderMiniBarChart(trendResp.labels, trendResp.values, '%', 'var(--brand-accent)')
+              : `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem;">Not enough data yet for ${tf} trend</div>`
+            }
           </div>
         </div>
       </div>
@@ -318,74 +415,55 @@ function renderOverviewTab({ facility, metrics, tf, trendData, isDemo }) {
 }
 
 // ---------------- TAB 2: DETERMINISTIC INSIGHTS ----------------
-function renderInsightsTab() {
+function renderInsightsTab({ insights, isDemo }) {
   return `
     <div style="display: flex; flex-direction: column; gap: 20px;">
       <div class="card" style="border-left: 4px solid var(--brand-accent);">
-        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
-          💡 Deterministic Rule-Based Operational Insights
-        </h3>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-          MealSense applies deterministic heuristics on operational logs to surface actionable dining recommendations without black-box hallucinations.
-        </p>
-
-        <div style="display: flex; flex-direction: column; gap: 14px;">
-          <!-- Insight 1: Waste Trend -->
-          <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; border: 1px solid var(--border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-              <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">
-                📉 Lunch Service Waste Dropped 22% Following Early Intent Peak
-              </div>
-              <span class="badge badge-eat">Operational Trend</span>
-            </div>
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0 8px 0; line-height: 1.5;">
-              When students respond before 10:00 AM, kitchen cook buffer targets tightened by 12 servings on average. Overproduction fell from 6.1% to 4.2% across Tuesday and Thursday lunch services.
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">
+              💡 Deterministic Rule-Based Operational Insights
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+              Generated algorithmically by InsightEngine over ${isDemo ? 'demo seed logs' : 'live dining data'}. Uses associative language and enforces small-sample privacy rules.
             </p>
-            <div style="font-size: 0.76rem; color: var(--brand-primary); font-weight: 700;">
-              Recommended Action: Keep 10:30 AM cutoff notification active to sustain early student response yields.
-            </div>
           </div>
+          <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}">
+            ${isDemo ? 'Demo Mode Analysis' : 'Live Data Analysis'}
+          </span>
+        </div>
 
-          <!-- Insight 2: Friday Dinner Variance -->
-          <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; border: 1px solid var(--border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-              <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">
-                ⚠️ Friday Dinner Exhibits 1.8× Higher Attendance Variance
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+          ${insights.map(item => `
+            <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; border: 1px solid var(--border-subtle); border-left: 3px solid ${item.badgeType === 'badge-eat' ? 'var(--color-eat)' : item.badgeType === 'badge-warning' ? 'var(--color-warning)' : 'var(--brand-accent)'};">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">
+                  ${item.title}
+                </div>
+                <span class="badge ${item.badgeType}" style="font-size: 0.72rem;">${item.badgeLabel}</span>
               </div>
-              <span class="badge badge-warning">Problem Area</span>
-            </div>
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0 8px 0; line-height: 1.5;">
-              Weekend departures cause Friday dinner attendance to drop between 18% and 34% below weekday averages. When unprompted, kitchen cooks overprepared by 38 servings on Friday nights.
-            </p>
-            <div style="font-size: 0.76rem; color: var(--brand-primary); font-weight: 700;">
-              Recommended Action: Conformal safety buffer automatically relaxes by -8 servings for Friday dinner services.
-            </div>
-          </div>
-
-          <!-- Insight 3: Menu Intelligence & Suppression Rule -->
-          <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; border: 1px solid var(--border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-              <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary);">
-                🍲 Menu Intelligence: High-Protein Paneer Dishes Reduce Plate Waste by 35%
+              <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0 8px 0; line-height: 1.5;">
+                ${item.explanation}
+              </p>
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 0.78rem; color: var(--brand-primary); font-weight: 700;">
+                  👉 Recommendation: ${item.actionLink}
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">
+                  Sample: ${item.sampleSize} meals • ${item.privacySuppressed ? 'N < 5 Suppressed' : 'Unsuppressed'}
+                </span>
               </div>
-              <span class="badge badge-eat">Menu Opportunity</span>
             </div>
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0 8px 0; line-height: 1.5;">
-              Dishes featuring Paneer or Dal Makhani show average plate scrapings of only 0.04 kg/diner, compared to 0.11 kg/diner for bottle-gourd / pumpkin preparations.
-            </p>
-            <div style="font-size: 0.76rem; color: var(--brand-primary); font-weight: 700;">
-              Recommended Action: Share palatability data with the student mess committee for next month's menu rotation.
-            </div>
-          </div>
+          `).join('')}
 
-          <!-- Small Group Privacy Rule Demonstration -->
+          <!-- Section 9 / 16.1: Small Group Privacy Suppression Rule Demonstration -->
           <div style="background: rgba(184, 93, 56, 0.04); border-radius: var(--radius-md); padding: 14px 16px; border: 1px dashed var(--brand-accent);">
             <div style="font-size: 0.84rem; font-weight: 800; color: var(--brand-primary); margin-bottom: 4px;">
-              🔒 Small-Group Privacy Suppression Rule (Section 23 Compliance)
+              🔒 Small-Group Privacy Suppression Rule
             </div>
             <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
-              <em>Block C (Wing 4) Intent Breakdown:</em> <strong>[ Insufficient data to display this breakdown — 3 responses ]</strong>.<br>
-              Breakdowns with fewer than 5 active students are automatically suppressed across all admin views to protect individual resident anonymity.
+              <em>Cohort Example (Block C, Wing 4):</em> <strong>[ Insufficient data to display this breakdown — 3 responses ]</strong>.<br>
+              Subgroup breakdowns with fewer than 5 active responses are suppressed across all aggregate dashboards to prevent resident re-identification.
             </p>
           </div>
         </div>
@@ -395,16 +473,10 @@ function renderInsightsTab() {
 }
 
 // ---------------- TAB 3: PRODUCT ANALYTICS & EXPERIMENTS ----------------
-function renderAnalyticsTab() {
-  const exp01 = store.experiments['exp-01-value-prop'];
-  const exp02 = store.experiments['exp-02-button-wording'];
-  const exp03 = store.experiments['exp-03-impact-feedback'];
-  const studentFunnel = tracker.getStudentFunnelMetrics();
-  const kitchenFunnel = tracker.getKitchenFunnelMetrics();
-
+function renderAnalyticsTab({ studentFunnel, kitchenFunnel, experiments, isDemo }) {
   return `
     <div style="display: flex; flex-direction: column; gap: 20px;">
-      <!-- Conversion Funnels Grid -->
+      <!-- Conversion Funnels Grid (Section 10) -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
         <!-- Student Funnel -->
         <div class="card">
@@ -415,14 +487,13 @@ function renderAnalyticsTab() {
             <span class="badge badge-eat">Yield: ${studentFunnel.onTimeYield}</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 10px;">
-            ${renderFunnelStep('1. App Opened', studentFunnel.appOpened, 100)}
-            ${renderFunnelStep('2. Meal Viewed', studentFunnel.mealViewed, 94.2)}
-            ${renderFunnelStep('3. Response Started', studentFunnel.responseStarted, 88.5)}
-            ${renderFunnelStep('4. Response Submitted', studentFunnel.responseSubmitted, 82.6)}
-            ${renderFunnelStep('5. On-Time Confirmed', studentFunnel.onTimeConfirmed, 77.3, true)}
+            ${studentFunnel.steps.map((step, idx) => 
+              renderFunnelStep(step.name, step.count, step.pct, idx === studentFunnel.steps.length - 1)
+            ).join('')}
           </div>
-          <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px;">
-            View-to-Response Conversion: <strong>${studentFunnel.viewToResponseRate}</strong>
+          <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; display: flex; justify-content: space-between;">
+            <span>View-to-Response Rate: <strong>${studentFunnel.viewToResponseRate}</strong></span>
+            <span>Events: <strong>${studentFunnel.sampleCount}</strong></span>
           </div>
         </div>
 
@@ -435,76 +506,98 @@ function renderAnalyticsTab() {
             <span class="badge badge-eat">Compliance: ${kitchenFunnel.complianceRate}</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 10px;">
-            ${renderFunnelStep('1. Forecast Viewed', kitchenFunnel.forecastViewed, 100)}
-            ${renderFunnelStep('2. Recommendation Reviewed', kitchenFunnel.recommendationReviewed, 100)}
-            ${renderFunnelStep('3. Decision Recorded', kitchenFunnel.decisionRecorded, 96.0)}
-            ${renderFunnelStep('4. Used Without Override', kitchenFunnel.acceptedWithoutOverride, 84.0, true)}
-            ${renderFunnelStep('5. Post-Meal Outcome Logged', kitchenFunnel.outcomesLogged, 98.0, true)}
+            ${kitchenFunnel.steps.map((step, idx) => 
+              renderFunnelStep(step.name, step.count, step.pct, idx === kitchenFunnel.steps.length - 1)
+            ).join('')}
           </div>
-          <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px;">
-            Cook Adoption Trust Ratio: <strong>${kitchenFunnel.acceptanceRate}</strong>
+          <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; display: flex; justify-content: space-between;">
+            <span>Cook Adoption Trust Ratio: <strong>${kitchenFunnel.acceptanceRate}</strong></span>
+            <span>Events: <strong>${kitchenFunnel.sampleCount}</strong></span>
           </div>
         </div>
       </div>
 
-      <!-- Active A/B Product Experiments Table -->
+      <!-- Active A/B Product Experiments Register (Section 11) -->
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">
-              🧪 Active Product Experiments Register
+              🧪 Product Experiments Register & Evidence Standards
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
-              Hypotheses tested through sticky randomized cohort assignments (Section 16)
+              Strict credibility policy: All simulated benchmarks are explicitly badged; unverified empirical claims are never shown as real.
             </span>
           </div>
-          <span class="badge badge-eat">3 Experiments Running</span>
+          <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}">
+            ${experiments.length} Experiments Registered
+          </span>
         </div>
 
-        <div class="data-table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Experiment ID & Name</th>
-                <th>Hypothesis / Primary Metric</th>
-                <th>Control (Var A)</th>
-                <th>Treatment (Var B)</th>
-                <th>Impact (Δ)</th>
-                <th>p-Value</th>
-                <th>Decision</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>EXP-01: Value Prop Framing</strong></td>
-                <td>Impact question boosts on-time response rate</td>
-                <td>68.4%</td>
-                <td><strong>76.2%</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">+7.8%</span></td>
-                <td>0.003</td>
-                <td><span class="badge badge-eat">Promoted Var B</span></td>
-              </tr>
-              <tr>
-                <td><strong>EXP-02: Intent Button Wording</strong></td>
-                <td>Concise verbs reduce decision latency</td>
-                <td>81.2% (4.2s)</td>
-                <td><strong>86.8% (2.6s)</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">+5.6%</span></td>
-                <td>0.012</td>
-                <td><span class="badge badge-eat">Promoted Var B</span></td>
-              </tr>
-              <tr>
-                <td><strong>EXP-03: My Impact Feedback</strong></td>
-                <td>Food saved metric increases Week-2 retention</td>
-                <td>58.5%</td>
-                <td><strong>74.8%</strong></td>
-                <td><span style="color: var(--color-eat); font-weight: 700;">+16.3%</span></td>
-                <td>< 0.001</td>
-                <td><span class="badge badge-eat">Integrated</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        ${experiments.length === 0 ? `
+          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.88rem;">
+            No experiments registered in this facility. To evaluate A/B testing frameworks, switch to Demo Mode.
+          </div>
+        ` : `
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Experiment ID & Hypothesis</th>
+                  <th>Status</th>
+                  <th>Primary / Guardrail Metric</th>
+                  <th>Variants</th>
+                  <th>Result Summary</th>
+                  <th>Evidence Classification</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${experiments.map(exp => `
+                  <tr>
+                    <td>
+                      <strong>${exp.id}: ${exp.name}</strong><br>
+                      <span style="font-size: 0.78rem; color: var(--text-secondary);">${exp.hypothesis}</span>
+                    </td>
+                    <td><span class="badge badge-eat">${exp.status}</span></td>
+                    <td>
+                      <span style="font-size: 0.78rem;"><strong>Pri:</strong> ${exp.primaryMetric}</span><br>
+                      <span style="font-size: 0.74rem; color: var(--text-muted);"><strong>Grd:</strong> ${exp.guardrailMetric}</span>
+                    </td>
+                    <td>
+                      <span style="font-size: 0.78rem;">
+                        ${(() => {
+                          const varA = Array.isArray(exp.variants) ? (exp.variants.find(v => v.id === 'A') || exp.variants[0]) : exp.variants?.A;
+                          const varB = Array.isArray(exp.variants) ? (exp.variants.find(v => v.id === 'B') || exp.variants[1]) : exp.variants?.B;
+                          return `A: ${varA?.name || 'Control'}<br>B: ${varB?.name || 'Treatment'} (Active: <strong>${exp.activeVariant}</strong>)`;
+                        })()}
+                      </span>
+                    </td>
+                    <td>
+                      ${exp.result ? `
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-eat);">
+                          ${exp.result.metricValue} (Var B vs Var A)
+                        </span><br>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">
+                          p = ${exp.result.pValue} • N = ${exp.result.sampleSize}
+                        </span>
+                      ` : `
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Not yet run</span>
+                      `}
+                    </td>
+                    <td>
+                      ${exp.result ? `
+                        <span class="badge ${exp.result.isRealData ? 'badge-eat' : 'badge-warning'}" style="font-size: 0.7rem;">
+                          ${exp.result.badgeLabel}
+                        </span>
+                      ` : `
+                        <span class="badge" style="font-size: 0.7rem; background: var(--bg-secondary);">Designed</span>
+                      `}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `}
       </div>
     </div>
   `;
@@ -519,7 +612,7 @@ function renderRoiCalculatorTab({ facility }) {
           💰 Institutional SaaS ROI & Scenario Calculator
         </h3>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
-          Model potential food savings, organic waste diversion, and net return on investment for university hostels and catering contractor bids.
+          Model potential food savings, organic waste diversion, and net return on investment for university hostels and catering contractor bids. (Scenario planning tool)
         </p>
       </div>
 
@@ -568,7 +661,7 @@ function renderRoiCalculatorTab({ facility }) {
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <span style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--color-eat); letter-spacing: 0.05em;">
-                Projected Institutional Return
+                Scenario Return Projection
               </span>
               <span class="badge badge-eat" id="calc-roi-multiple">8.08× ROI</span>
             </div>
@@ -599,7 +692,7 @@ function renderRoiCalculatorTab({ facility }) {
           </div>
 
           <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 8px;">
-            <em>Notice:</em> All figures are scenario estimates for planning purposes based on 3 daily meals and 30 monthly service days.
+            <em>Scenario Estimate Disclosure:</em> Calculations assume 3 daily meals across 30 monthly service days. Actual fiscal results depend on food cost fluctuations and staff adherence.
           </div>
         </div>
       </div>
@@ -619,7 +712,7 @@ function renderGovernanceTab({ facility, accounts, students, isDemo }) {
               👥 Registered Dining Members Roster
             </h3>
             <span style="font-size: 0.82rem; color: var(--text-muted);">
-              ${students.length} verified residents registered for ${facility.name}
+              ${students.length} residents registered for ${facility.name}
             </span>
           </div>
         </div>
@@ -655,7 +748,7 @@ function renderGovernanceTab({ facility, accounts, students, isDemo }) {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">🎯 Conformal Prediction Governance</h3>
-            <span style="font-size: 0.82rem; color: var(--text-muted);">Model tier progression and walk-forward verification</span>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">Model tier progression and walk-forward verification (Historical calibration)</span>
           </div>
           <span class="badge badge-eat">80% Nominal Target</span>
         </div>
@@ -665,7 +758,7 @@ function renderGovernanceTab({ facility, accounts, students, isDemo }) {
             <thead>
               <tr>
                 <th>Model Name</th>
-                <th>Status</th>
+                <th>Tier</th>
                 <th>MAE (heads)</th>
                 <th>MAPE (%)</th>
                 <th>Bias</th>
@@ -780,14 +873,15 @@ function setupRoiCalculator(container) {
   }
 
   [sliderResidents, sliderCost, sliderRed, sliderSaas].forEach(s => {
-    s.addEventListener('input', updateRoi);
+    s?.addEventListener('input', updateRoi);
   });
 }
 
-// Section 24: Human-Readable Monthly Mess Audit Report Modal
+// Section 18 / 24: Monthly Mess Report Modal (Dynamically derived from active data)
 function openMonthlyReportModal() {
   const modalOverlay = document.getElementById('modal-overlay');
   const modalBody = document.getElementById('modal-body');
+  const isDemo = Boolean(store.isDemo);
   const report = api.getMonthlyReport('September 2026');
 
   modalBody.innerHTML = `
@@ -805,7 +899,9 @@ function openMonthlyReportModal() {
           </span>
         </div>
         <div style="text-align: right;">
-          <span class="badge badge-eat" style="font-size: 0.78rem;">✓ Guardrail Verified</span>
+          <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.78rem;">
+            ${isDemo ? 'Demo Dataset' : 'Measured Facility Data'}
+          </span>
           <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Report Ref: MS-2026-09-A</div>
         </div>
       </div>
@@ -814,7 +910,7 @@ function openMonthlyReportModal() {
         <div style="background: var(--bg-secondary); padding: 12px; border-radius: var(--radius-sm); font-size: 0.82rem; line-height: 1.6;">
           <div><strong>Total Meals Served:</strong> ${report.totalMealsServed.toLocaleString('en-IN')} meals</div>
           <div><strong>Total Organic Waste:</strong> ${report.totalWasteKg} kg</div>
-          <div><strong>Avoidable Waste / Meal:</strong> <strong>${report.wastePerMealKg} kg/meal</strong> (Baseline: 0.230 kg)</div>
+          <div><strong>Avoidable Waste / Meal:</strong> <strong>${report.wastePerMealKg} kg/meal</strong> (Baseline: ${report.baselineWasteKg} kg)</div>
           <div><strong>Waste Reduction:</strong> <span style="color: var(--color-eat); font-weight: 700;">↓ ${report.wasteReductionPct}%</span></div>
         </div>
         <div style="background: var(--bg-secondary); padding: 12px; border-radius: var(--radius-sm); font-size: 0.82rem; line-height: 1.6;">
@@ -826,8 +922,8 @@ function openMonthlyReportModal() {
       </div>
 
       <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-        <strong>Executive Audit Certification:</strong><br>
-        This dining hall operated within authorized food waste reduction parameters throughout the reporting cycle. Conformal safety buffers prevented student food shortages (0 shortages logged). Donated surplus: ${report.donatedFoodKg} kg food dispatched to local community partners.
+        <strong>Operational Statement:</strong><br>
+        This operational summary is derived dynamically by MealSense's central MetricEngine from ${isDemo ? 'sample operational records' : 'logged dining records'}. Conformal safety buffers maintained food security with ${report.shortageRate}% shortage rate. Surplus disposition dispatched ${report.donatedFoodKg} kg to community recovery partners.
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 14px;">
@@ -852,12 +948,12 @@ function openMonthlyReportModal() {
   document.getElementById('btn-print-report').onclick = () => window.print();
   document.getElementById('btn-csv-report').onclick = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
-      + "Metric,Value,Baseline,Status\n"
-      + `Total Meals,${report.totalMealsServed},N/A,Verified\n`
+      + "Metric,Value,Baseline,Classification\n"
+      + `Total Meals,${report.totalMealsServed},N/A,Operational Record\n`
       + `Waste per Meal (kg),${report.wastePerMealKg},${report.baselineWasteKg},Reduced ${report.wasteReductionPct}%\n`
       + `Overproduction Rate,${report.overproductionRate}%,${report.baselineOverproductionRate}%,Reduced\n`
-      + `Shortage Rate,${report.shortageRate}%,0.40%,Guardrail OK\n`
-      + `Estimated Savings (INR),${report.estimatedSavingsVsBaseline},0,Baseline Est\n`;
+      + `Shortage Rate,${report.shortageRate}%,0.40%,Guardrail Maintained\n`
+      + `Estimated Savings (INR),${report.estimatedSavingsVsBaseline},0,Scenario Estimate\n`;
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -879,21 +975,21 @@ function openMethodologyModal() {
       📐 Defensible Baseline & Savings Methodology
     </h3>
     <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-      <p><strong>Why MealSense Renamed "Avoided Cost" to "Estimated Savings vs. Baseline":</strong></p>
+      <p><strong>Defensible Savings Methodology vs Unsubstantiated Claims:</strong></p>
       <p>
-        In institutional facilities, ungrounded financial claims fail audit scrutiny. MealSense establishes an audited 30-day pre-implementation baseline period to measure true operational change:
+        In institutional dining, ungrounded financial claims fail administrative scrutiny. MealSense uses an audited 30-day pre-implementation baseline period to measure true operational change:
       </p>
       <ul style="margin-left: 20px; margin-top: 6px;">
-        <li><strong>Baseline Period:</strong> August 1–31, 2026 (Unassisted gut-feel cooking).</li>
+        <li><strong>Baseline Reference Period:</strong> August 1–31, 2026 (Unassisted gut-feel cooking).</li>
         <li><strong>Baseline Overproduction Rate:</strong> 6.10% overprepared servings.</li>
         <li><strong>Baseline Food Waste:</strong> 0.230 kg unserved waste per meal.</li>
-        <li><strong>Cost Calibration:</strong> ₹42.00 raw food material cost per portion.</li>
+        <li><strong>Portion Cost Calibration:</strong> ₹42.00 raw food material cost per portion.</li>
       </ul>
       <div style="background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-top: 10px;">
-        <code>Savings = (Baseline Overprod % - Current Overprod %) × Cooked Servings × ₹42.00</code>
+        <code>Savings = (Baseline Overprod % - Current Overprod %) × Cooked Servings × Raw Portion Cost</code>
       </div>
       <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
-        *All figures are clearly flagged in the interface as operational scenario estimates rather than financial guarantees.
+        *All figures are flagged in the interface as scenario estimates rather than financial guarantees.
       </p>
     </div>
     <div style="display: flex; justify-content: flex-end;">
@@ -940,12 +1036,13 @@ function openFacilityEditModal() {
   modalOverlay.classList.add('active');
   document.getElementById('modal-cancel-cfg-btn').onclick = () => modalOverlay.classList.remove('active');
   document.getElementById('modal-save-cfg-btn').onclick = () => {
-    facility.name = document.getElementById('cfg-fac-name').value;
-    facility.registeredCount = parseInt(document.getElementById('cfg-fac-capacity').value, 10);
-    facility.kgPerServing = parseFloat(document.getElementById('cfg-fac-weight').value);
-    facility.costPerServing = parseFloat(document.getElementById('cfg-fac-cost').value);
+    store.updateFacility({
+      name: document.getElementById('cfg-fac-name').value,
+      registeredCount: parseInt(document.getElementById('cfg-fac-capacity').value, 10),
+      kgPerServing: parseFloat(document.getElementById('cfg-fac-weight').value),
+      costPerServing: parseFloat(document.getElementById('cfg-fac-cost').value)
+    });
     modalOverlay.classList.remove('active');
-    store.notify();
     window.showToast('Facility parameters updated', 'success');
   };
 }

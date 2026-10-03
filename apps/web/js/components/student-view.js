@@ -1,12 +1,13 @@
 /**
  * Student PWA View Component
- * PM Upgrade Version 2.0
+ * PM Upgrade Version 2.1 (Two Explicit Data Modes: Demo & Live)
  * 
  * Features:
  * - One-tap Eat/Skip intent decision (< 3s completion time)
- * - Dynamic Value Proposition with A/B experiment variant support
- * - Personal "My Impact" metrics & 4-week response trend
- * - Multi-day Away Mode & DPDP privacy controls
+ * - Section 4.1: Clean Live Empty State
+ * - Section 12: Data-derived "My Impact" metrics calculated from actual student response history
+ * - Section 12.1: Strict restriction of A/B experiment controls (only shown in Demo/QA mode)
+ * - Multi-day Away Mode & Privacy-conscious controls
  */
 
 import { store } from '../store.js';
@@ -17,41 +18,103 @@ export function renderStudentView(container) {
   const user = store.currentUser || { name: 'Resident', block: 'Room', hostelName: 'Mess' };
   const firstName = user.name.split(' ')[0] || 'Resident';
   const now = new Date();
+  const provider = store.getDataProvider();
 
   // Time-aware greeting
   const hours = now.getHours();
   const greeting = hours < 12 ? 'Good morning' : (hours < 17 ? 'Good afternoon' : 'Good evening');
 
-  const meals = store.meals || [];
+  const meals = provider.getMeals() || [];
+  const publishedMeals = meals.filter(m => m.status === 'published' || m.status === 'closed');
   
-  // Active Experiment Variants
-  const expValProp = store.experiments['exp-01-value-prop'];
-  const expBtnWording = store.experiments['exp-02-button-wording'];
+  // Active Experiment Variants (Restricted in Live Mode)
+  const experiments = store.experiments;
+  const expValProp = experiments.find(e => e.id === 'exp-01-value-prop');
+  const expBtnWording = experiments.find(e => e.id === 'exp-02-button-wording');
 
-  const valuePropText = expValProp.variants[expValProp.currentVariant].text;
-  const btnEatLabel = expBtnWording.variants[expBtnWording.currentVariant].eat;
-  const btnSkipLabel = expBtnWording.variants[expBtnWording.currentVariant].skip;
+  const activeValPropVariant = expValProp ? expValProp.activeVariant : 'B';
+  const valPropVariantObj = expValProp?.variants?.find(v => v.id === activeValPropVariant) || expValProp?.variants?.[1] || { text: 'Help your mess reduce food waste — will you eat lunch?' };
+  const valuePropText = valPropVariantObj.text || 'Help your mess reduce food waste — will you eat lunch?';
+
+  const activeBtnVariant = expBtnWording ? expBtnWording.activeVariant : 'B';
+  const btnEatLabel = activeBtnVariant === 'A' ? "I'll Eat" : "Eating";
+  const btnSkipLabel = activeBtnVariant === 'A' ? "I'll Skip" : "Not Eating";
+
+  // Section 12: Derive My Impact directly from student's actual responses
+  const studentResponses = provider.getStudentResponses() || [];
+  const totalResponded = studentResponses.length;
+  const onTimeCount = studentResponses.filter(r => !r.isLate).length;
+  const skipCount = studentResponses.filter(r => r.response === 'skip').length;
+  const onTimeRate = totalResponded > 0 ? ((onTimeCount / totalResponded) * 100).toFixed(1) : '0.0';
+  const foodAvoidedKg = (skipCount * (provider.getFacility().kgPerServing || 0.350)).toFixed(1);
+
+  // If in Live Mode and zero meals published, render Section 4.1 Clean Empty State
+  if (publishedMeals.length === 0 && !store.isDemo) {
+    container.innerHTML = `
+      <div class="student-container">
+        <div class="student-greeting" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px;">
+          <div>
+            <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+              ${greeting}, ${firstName} 👋
+            </h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+              ${user.block} • ${user.hostelName}
+            </span>
+          </div>
+          <button id="btn-privacy-settings" class="pill-btn">🔒 Privacy</button>
+        </div>
+
+        <!-- Section 4.1: Clean Live Empty State -->
+        <div class="card" style="text-align: center; padding: 56px 20px;">
+          <div style="font-size: 2.8rem; margin-bottom: 14px;">🍲</div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+            No meals published yet
+          </h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 20px auto; line-height: 1.5;">
+            Your kitchen team for <strong>${user.hostelName}</strong> has not published upcoming menus yet. Eat/Skip decision cards will appear here as soon as published.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button id="btn-empty-explore-demo" class="btn btn-primary">
+              🚀 Explore Demo Mode
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const demoBtn = container.querySelector('#btn-empty-explore-demo');
+    if (demoBtn) demoBtn.onclick = () => store.switchToDemo('student');
+
+    const privBtn = container.querySelector('#btn-privacy-settings');
+    if (privBtn) privBtn.onclick = () => window.openPrivacyModal();
+    return;
+  }
 
   const html = `
     <div class="student-container">
       <!-- Greeting & Header -->
       <div class="student-greeting" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
         <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-            ${greeting}, ${firstName} 👋
-          </h2>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+              ${greeting}, ${firstName} 👋
+            </h2>
+            <span class="badge ${store.isDemo ? 'badge-eat' : 'badge-warning'}" style="font-size: 0.68rem;">
+              ${store.isDemo ? 'Demo Mode' : 'Live Mode'}
+            </span>
+          </div>
           <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
             ${user.block} • ${user.hostelName}
           </span>
         </div>
         <div style="display: flex; gap: 6px;">
-          <button id="btn-privacy-settings" class="pill-btn" title="View DPDP Data Privacy Rights">
+          <button id="btn-privacy-settings" class="pill-btn" title="View Privacy Rights">
             🔒 Privacy
           </button>
         </div>
       </div>
 
-      <!-- Value Proposition Banner (A/B Test Variant) -->
+      <!-- Value Proposition Banner -->
       <div class="card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-secondary) 100%); border-left: 4px solid var(--brand-accent); padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 1.6rem;">🌱</span>
@@ -64,14 +127,18 @@ export function renderStudentView(container) {
             </div>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="badge" style="font-size: 0.7rem; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color);">
-            A/B Test: Var ${expValProp.currentVariant}
-          </span>
-          <button id="btn-toggle-val-prop" class="pill-btn" style="font-size: 0.72rem; padding: 4px 8px;" title="Switch Experiment Variant">
-            Toggle ⇄
-          </button>
-        </div>
+
+        <!-- Section 12.1: Experiment Controls (STRICTLY HIDDEN IN LIVE MODE) -->
+        ${store.isDemo ? `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge" style="font-size: 0.7rem; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color);" title="Experiment Variant Active in Demo">
+              A/B Test: Var ${activeValPropVariant}
+            </span>
+            <button id="btn-toggle-val-prop" class="pill-btn" style="font-size: 0.72rem; padding: 4px 8px;" title="Switch Experiment Variant (Demo Only)">
+              Toggle ⇄
+            </button>
+          </div>
+        ` : ''}
       </div>
 
       <!-- Quick Actions Bar -->
@@ -79,28 +146,16 @@ export function renderStudentView(container) {
         <button id="btn-bulk-skip-tomorrow" class="pill-btn">⚡ Skip All Tomorrow</button>
         <button id="btn-open-away-modal" class="pill-btn">✈️ Away Mode</button>
         <button id="btn-scroll-to-impact" class="pill-btn" style="background: var(--color-eat-bg); color: var(--color-eat); border-color: var(--color-eat-border);">
-          🏆 My Impact (2.1 kg Saved)
+          🏆 My Impact (${foodAvoidedKg} kg Saved)
         </button>
       </div>
 
       <!-- Meal Cards Feed -->
       <div class="meals-feed" style="display: flex; flex-direction: column; gap: 18px; margin-bottom: 30px;">
-        ${meals.length > 0 ? (
-          meals.map(meal => renderMealCard(meal, now, btnEatLabel, btnSkipLabel)).join('')
-        ) : (
-          `
-          <div class="card" style="text-align: center; padding: 48px 20px;">
-            <div style="font-size: 2.5rem; margin-bottom: 12px;">🍲</div>
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">No Meals Scheduled Yet</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 380px; margin: 6px auto 16px auto;">
-              The kitchen team for <strong>${user.hostelName}</strong> has not published upcoming menus yet.
-            </p>
-          </div>
-          `
-        )}
+        ${publishedMeals.map(meal => renderMealCard(meal, now, btnEatLabel, btnSkipLabel)).join('')}
       </div>
 
-      <!-- Section 7.2: My Impact Card -->
+      <!-- Section 12: Data-Derived My Impact Card -->
       <div class="card" id="student-impact-card" style="margin-top: 10px; border-top: 3px solid var(--color-eat);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <div>
@@ -108,29 +163,29 @@ export function renderStudentView(container) {
               <span>🌱</span> My Personal Dining Impact
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
-              Verified data from your mess responses over trailing 30 days
+              Calculated from your response history (${store.isDemo ? 'Sample Demo History' : 'Live Records'})
             </span>
           </div>
           <span class="badge badge-eat" style="font-size: 0.76rem;">
-            Top 15% Responder
+            ${totalResponded > 5 ? 'Active Responder' : 'New Diner'}
           </span>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 18px;">
           <div style="background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-subtle);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary);">28</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary);">${totalResponded}</div>
             <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Meals Responded</div>
           </div>
           <div style="background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-subtle);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">96.4%</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">${onTimeRate}%</div>
             <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">On-Time Rate</div>
           </div>
           <div style="background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-subtle);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary);">6</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary);">${skipCount}</div>
             <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Meals Skipped</div>
           </div>
           <div style="background: var(--color-eat-bg); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-eat-border);">
-            <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">2.1 kg</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: var(--color-eat);">${foodAvoidedKg} kg</div>
             <div style="font-size: 0.78rem; color: var(--color-eat); font-weight: 700; text-transform: uppercase;">Food Avoided*</div>
           </div>
         </div>
@@ -139,30 +194,32 @@ export function renderStudentView(container) {
         <div style="background: var(--bg-secondary); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);">4-Week Response Consistency</span>
-            <span style="font-size: 0.78rem; color: var(--color-eat); font-weight: 600;">Consistent participation</span>
+            <span style="font-size: 0.78rem; color: var(--color-eat); font-weight: 600;">
+              ${totalResponded > 0 ? 'Data-derived participation' : 'Awaiting responses'}
+            </span>
           </div>
           <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 55px; gap: 8px; padding-top: 10px;">
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--border-color); height: 35px; border-radius: 4px 4px 0 0;"></div>
+              <div style="width: 100%; background: var(--border-color); height: ${totalResponded > 3 ? '35px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.7rem; color: var(--text-muted);">Week 1</span>
             </div>
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--border-color); height: 42px; border-radius: 4px 4px 0 0;"></div>
+              <div style="width: 100%; background: var(--border-color); height: ${totalResponded > 5 ? '42px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.7rem; color: var(--text-muted);">Week 2</span>
             </div>
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--color-eat); height: 48px; border-radius: 4px 4px 0 0;"></div>
+              <div style="width: 100%; background: var(--color-eat); height: ${totalResponded > 6 ? '48px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.7rem; color: var(--text-muted);">Week 3</span>
             </div>
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div style="width: 100%; background: var(--color-eat); height: 52px; border-radius: 4px 4px 0 0;"></div>
+              <div style="width: 100%; background: var(--color-eat); height: ${totalResponded > 0 ? '52px' : '6px'}; border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">This Wk</span>
             </div>
           </div>
         </div>
 
         <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
-          *<em>Methodology Notice:</em> Food avoided estimate is calculated as 0.350 kg/serving avoided whenever an on-time 'Skip' response allowed the kitchen to adjust batch preparation. Only advance responses prevent overcooking.
+          *<em>Methodology Notice:</em> Food avoided estimate is calculated as 0.350 kg/serving avoided whenever an on-time 'Skip' response allowed the kitchen to adjust batch preparation. Only advance notice prevents unnecessary cauldron cooking.
         </div>
       </div>
     </div>
@@ -213,7 +270,7 @@ function renderMealCard(meal, now, btnEatLabel, btnSkipLabel) {
       <div style="margin-bottom: 12px;">
         <div style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; color: var(--text-primary);">${meal.name}</div>
         <div class="menu-items-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
-          ${meal.items.map(item => `<span class="menu-item-tag">${item}</span>`).join('')}
+          ${(meal.items || []).map(item => `<span class="menu-item-tag">${item}</span>`).join('')}
         </div>
       </div>
 
@@ -269,14 +326,16 @@ function attachStudentEvents(container) {
     });
   });
 
-  // Toggle Value Proposition Experiment Variant
+  // Toggle Value Proposition Experiment Variant (Demo Only)
   const btnToggleVal = container.querySelector('#btn-toggle-val-prop');
   if (btnToggleVal) {
     btnToggleVal.addEventListener('click', () => {
-      const cur = store.experiments['exp-01-value-prop'].currentVariant;
+      const exps = store.experiments;
+      const expValProp = exps.find(e => e.id === 'exp-01-value-prop');
+      const cur = expValProp ? expValProp.activeVariant : 'A';
       const next = cur === 'A' ? 'B' : 'A';
       store.setExperimentVariant('exp-01-value-prop', next);
-      window.showToast(`Switched Value Prop Experiment to Variant ${next}`, 'success');
+      window.showToast(`Switched Value Prop Experiment to Variant ${next} (Demo)`, 'success');
     });
   }
 

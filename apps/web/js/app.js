@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function render() {
     renderHeader();
+    renderDemoModeBanner();
     renderGuidedTourBanner();
 
     if (!store.isAuthenticated || store.currentRole === 'auth') {
@@ -31,6 +32,46 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (store.currentRole === 'admin') {
       renderAdminView(mainContainer);
     }
+  }
+
+  // Section 3.2: Demo Mode Banner & Reset Entry Point
+  function renderDemoModeBanner() {
+    const demoBanner = document.getElementById('demo-mode-banner');
+    if (!demoBanner) return;
+
+    if (!store.isAuthenticated || !store.isDemo) {
+      demoBanner.style.display = 'none';
+      return;
+    }
+
+    demoBanner.style.display = 'block';
+    demoBanner.innerHTML = `
+      <div class="demo-banner-inner">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge badge-eat" style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em;">DEMO MODE</span>
+          <span style="color: var(--text-primary); font-weight: 600; font-size: 0.82rem;">Sample operational data</span>
+          <span style="color: var(--text-muted); font-size: 0.8rem;">• Explore the complete MealSense workflow without entering data</span>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button id="btn-reset-demo-banner" class="btn btn-secondary btn-sm" style="padding: 3px 10px; font-size: 0.72rem;" title="Reset demo dataset back to initial seeded state">
+            🔄 Reset Demo
+          </button>
+          <button id="btn-exit-demo-banner" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 0.72rem;" title="Sign out of demo mode">
+            Exit Demo
+          </button>
+        </div>
+      </div>
+    `;
+
+    demoBanner.querySelector('#btn-reset-demo-banner')?.addEventListener('click', () => {
+      store.resetDemo();
+      window.showToast('Demo dataset restored to initial seed', 'success');
+    });
+
+    demoBanner.querySelector('#btn-exit-demo-banner')?.addEventListener('click', () => {
+      store.logout();
+      window.showToast('Exited demo mode', 'info');
+    });
   }
 
   function renderHeader() {

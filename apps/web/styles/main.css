@@ -458,6 +458,25 @@ body {
 /* ==========================================================================
    Guided 60-Second PM Tour Banner Styling
    ========================================================================== */
+.demo-mode-banner {
+  background: var(--bg-surface-elevated);
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 24px;
+  position: sticky;
+  top: 67px;
+  z-index: 84;
+}
+
+.demo-banner-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .guided-tour-banner {
   background: var(--bg-surface-elevated);
   border-bottom: 2px solid var(--brand-accent);

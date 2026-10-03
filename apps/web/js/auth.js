@@ -101,8 +101,14 @@ export const authService = {
   async authenticate(identifier, password) {
     const cleanId = identifier.trim().toLowerCase();
 
-    // 1. Dedicated Demo Testing Accounts
-    if (cleanId === 'student_testid' || cleanId === 'student_testid@mealsense.app') {
+    // 1. Dedicated Demo Testing Accounts (support common demo aliases)
+    if (
+      cleanId === 'student_testid' ||
+      cleanId === 'student_testid@mealsense.app' ||
+      cleanId === 'student' ||
+      cleanId === 'demo' ||
+      cleanId === 'demo_student'
+    ) {
       const session = {
         id: 'student_testid',
         name: 'Aarav Sharma (Demo Student)',
@@ -118,7 +124,14 @@ export const authService = {
       return session;
     }
 
-    if (cleanId === 'staff_testid' || cleanId === 'staff_testid@mealsense.app') {
+    if (
+      cleanId === 'staff_testid' ||
+      cleanId === 'staff_testid@mealsense.app' ||
+      cleanId === 'staff' ||
+      cleanId === 'chef' ||
+      cleanId === 'kitchen' ||
+      cleanId === 'demo_staff'
+    ) {
       const session = {
         id: 'staff_testid',
         name: 'Chef Rajesh Kumar (Demo Chef)',
@@ -134,7 +147,13 @@ export const authService = {
       return session;
     }
 
-    if (cleanId === 'admin_testid' || cleanId === 'admin_testid@mealsense.app') {
+    if (
+      cleanId === 'admin_testid' ||
+      cleanId === 'admin_testid@mealsense.app' ||
+      cleanId === 'admin' ||
+      cleanId === 'warden' ||
+      cleanId === 'demo_admin'
+    ) {
       const session = {
         id: 'admin_testid',
         name: 'Dr. V. K. Verma (Demo Warden)',
