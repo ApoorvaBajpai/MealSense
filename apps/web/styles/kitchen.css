@@ -247,7 +247,7 @@
   background: var(--text-primary);
   border-radius: 2px;
   transform: translateX(-50%);
-  box-shadow: 0 0 10px rgba(255,255,255,0.25);
+  box-shadow: 0 0 10px rgba(255, 247, 230, 0.25);
 }
 
 .marker-label {
@@ -314,7 +314,7 @@
   box-shadow: 0 2px 8px var(--emerald-glow);
   cursor: pointer;
   margin-top: -6px;
-  border: 2px solid #fff;
+  border: 2px solid #FFF7E6;
   transition: box-shadow var(--transition-fast);
 }
 
@@ -455,7 +455,7 @@
 .commit-btn-label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
+  color: #F5EBD8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 2px;
@@ -465,7 +465,7 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 900;
-  color: #fff;
+  color: #FFF7E6;
   letter-spacing: -0.03em;
   line-height: 1;
 }
@@ -473,14 +473,14 @@
 .commit-btn-unit {
   font-size: 0.9rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.75);
+  color: #F5EBD8;
   margin-left: 3px;
 }
 
 .commit-btn-icon {
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 247, 230, 0.20);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -617,7 +617,7 @@
 }
 
 [data-theme="dark"] .commit-decision-btn:hover {
-  background: #FFFFFF;
-  border-color: #FFFFFF;
+  background: #F5EBD8;
+  border-color: #F5EBD8;
   color: #0A122A;
 }

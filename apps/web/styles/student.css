@@ -58,7 +58,7 @@
 
 /* ── Value Prop Banner ─────────────────────────────────────── */
 .value-prop-banner {
-  background: #FFFFFF;
+  background: #FFF7E6;
   border: 1.5px solid #0A122A;
   border-radius: var(--radius-lg);
   padding: 16px 20px;
@@ -395,9 +395,9 @@
   transform: translateY(-1px);
 }
 
-/* Skip button — Crisp white with Midnight Navy outline */
+/* Skip button — Beige with Midnight Navy outline */
 .response-btn-skip {
-  background: #FFFFFF;
+  background: #FFF7E6;
   color: #36415C;
   border: 2px solid rgba(10, 18, 42, 0.25);
   box-shadow: 0 2px 8px rgba(10, 18, 42, 0.05);
@@ -406,7 +406,7 @@
 }
 
 .response-btn-skip:hover {
-  background: #FFFDF9;
+  background: #F3E5C8;
   border-color: #0A122A;
   color: var(--palette-midnight-navy);
   transform: translateY(-2px);
@@ -417,7 +417,7 @@
   background: #253352;
   color: var(--palette-vanilla);
   border-color: #0A122A;
-  box-shadow: 0 8px 24px rgba(10, 18, 42, 0.35), inset 0 1px 0 rgba(255,255,255,0.20);
+  box-shadow: 0 8px 24px rgba(10, 18, 42, 0.35);
   transform: translateY(-1px);
 }
 
@@ -433,7 +433,7 @@
 .pill-btn-impact:hover {
   background: #15234E !important;
   border-color: #0A122A !important;
-  color: #FFFFFF !important;
+  color: #FFF7E6 !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 20px rgba(10, 18, 42, 0.40) !important;
 }

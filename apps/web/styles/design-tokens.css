@@ -11,19 +11,19 @@
   --palette-vanilla:       #FFF7E6;      /* Light Vanilla */
   --palette-midnight-navy: #0A122A;      /* Midnight Navy */
 
-  /* ── Foundational Surfaces (Light Vanilla Canvas & Crisp White Cards) */
-  --bg-base:               #F9EED4;      /* Rich warm vanilla base */
+  /* ── Foundational Surfaces (Strictly Light Vanilla Beige & Warm Neutral Surfaces — No White) */
+  --bg-base:               #F5EAD4;      /* Warm beige base */
   --bg-primary:            #FFF7E6;      /* Exact Light Vanilla canvas */
   --bg-secondary:          #F3E5C8;      /* Warm vanilla cream secondary */
-  --bg-surface:            #FFFFFF;      /* Brilliant pure white card — pops off the vanilla canvas */
-  --bg-surface-2:          #FFFDF9;      /* Luminous elevated surface */
-  --bg-surface-3:          #F2E2C2;      /* Accent vanilla panel */
+  --bg-surface:            #FFF7E6;      /* Light Vanilla Beige surface */
+  --bg-surface-2:          #F8EEDB;      /* Soft elevated beige surface */
+  --bg-surface-3:          #EFE0BD;      /* Accent vanilla panel */
 
   /* ── Glass Layer (Frosted Light Vanilla) ─────────────────── */
-  --glass-bg:              rgba(255, 247, 230, 0.92);
-  --glass-bg-light:        rgba(255, 255, 255, 0.88);
-  --glass-border:          rgba(10, 18, 42, 0.10);
-  --glass-border-hover:    rgba(10, 18, 42, 0.22);
+  --glass-bg:              #FFF7E6;
+  --glass-bg-light:        #FFF7E6;
+  --glass-border:          rgba(10, 18, 42, 0.15);
+  --glass-border-hover:    rgba(10, 18, 42, 0.30);
 
   /* ── Borders (Midnight Navy Outlines) ────────────────────── */
   --border-subtle:         rgba(10, 18, 42, 0.08);
@@ -101,7 +101,7 @@
   --color-eat-glow:        rgba(10, 18, 42, 0.28);
 
   --color-skip:            #36415C;
-  --color-skip-bg:         #FFFFFF;
+  --color-skip-bg:         #FFF7E6;
   --color-skip-border:     rgba(10, 18, 42, 0.25);
 
   --color-warning:         #B45309;      /* Amber gold */
@@ -150,28 +150,28 @@
   --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
-/* ── Light Mode Alignment (Light Vanilla & Midnight Navy) ──── */
+/* ── Light Mode Alignment (Beige Only — No Pure White) ─────── */
 [data-theme="light"] {
-  --bg-base:               #F9EED4;
-  --bg-primary:            #FFF7E6;      /* Exact Light Vanilla */
+  --bg-base:               #F5EAD4;
+  --bg-primary:            #FFF7E6;      /* Exact Light Vanilla Beige */
   --bg-secondary:          #F3E5C8;
-  --bg-surface:            #FFFFFF;      /* Pure white cards for maximum crispness */
-  --bg-surface-2:          #FFFDF9;
-  --bg-surface-3:          #F2E2C2;
+  --bg-surface:            #FFF7E6;      /* Beige surface */
+  --bg-surface-2:          #F8EEDB;
+  --bg-surface-3:          #EFE0BD;
 
-  --glass-bg:              rgba(255, 247, 230, 0.92);
-  --glass-bg-light:        rgba(255, 255, 255, 0.88);
-  --glass-border:          rgba(10, 18, 42, 0.10);
-  --glass-border-hover:    rgba(10, 18, 42, 0.22);
+  --glass-bg:              #FFF7E6;
+  --glass-bg-light:        #FFF7E6;
+  --glass-border:          rgba(10, 18, 42, 0.15);
+  --glass-border-hover:    rgba(10, 18, 42, 0.30);
 
   --border-subtle:         rgba(10, 18, 42, 0.08);
-  --border-default:        rgba(10, 18, 42, 0.15);
-  --border-strong:         rgba(10, 18, 42, 0.32);
+  --border-default:        rgba(10, 18, 42, 0.18);
+  --border-strong:         rgba(10, 18, 42, 0.35);
 
   --text-primary:          #0A122A;      /* Exact Midnight Navy */
   --text-secondary:        #36415C;
   --text-muted:            #687492;
-  --text-inverse:          #FFF7E6;      /* Exact Light Vanilla */
+  --text-inverse:          #FFF7E6;      /* Exact Light Vanilla Beige */
 
   --shadow-xs:   0 1px 2px rgba(10, 18, 42, 0.05);
   --shadow-sm:   0 2px 8px rgba(10, 18, 42, 0.07);
@@ -185,7 +185,10 @@
   --color-eat-bg:          rgba(10, 18, 42, 0.06);
   --color-eat-bg-hover:    rgba(10, 18, 42, 0.12);
   --color-eat-border:      #0A122A;
-  --emerald-glow:          rgba(10, 18, 42, 0.28);
+
+  --color-skip:            #36415C;
+  --color-skip-bg:         #FFF7E6;
+  --color-skip-border:     rgba(10, 18, 42, 0.25);
 }
 
 /* ── Luxurious Midnight Navy Velvet Dark Mode (Solid Colors Only) ──── */
@@ -197,30 +200,36 @@
   --bg-surface-2:          #1D2D5E;      /* Interactive elevated panel */
   --bg-surface-3:          #263973;      /* Highlighted navy */
 
-  --glass-bg:              #16234B;
+  --glass-bg:              #0A122A;
   --glass-bg-light:        #101B3B;
-  --glass-border:          rgba(255, 247, 230, 0.25);
-  --glass-border-hover:    rgba(255, 247, 230, 0.45);
+  --glass-border:          rgba(255, 247, 230, 0.30);
+  --glass-border-hover:    rgba(255, 247, 230, 0.50);
 
-  --border-subtle:         rgba(255, 247, 230, 0.18);
-  --border-default:        rgba(255, 247, 230, 0.30);
-  --border-strong:         rgba(255, 247, 230, 0.50);
-  --border-color:          rgba(255, 247, 230, 0.30);
-  --border-blue:           rgba(255, 247, 230, 0.35);
+  --border-subtle:         rgba(255, 247, 230, 0.20);
+  --border-default:        rgba(255, 247, 230, 0.35);
+  --border-strong:         rgba(255, 247, 230, 0.60);
+  --border-color:          rgba(255, 247, 230, 0.35);
+  --border-blue:           rgba(255, 247, 230, 0.40);
 
-  --text-primary:          #FFF7E6;      /* Exact Light Vanilla: 100% visible */
+  --text-primary:          #FFF7E6;      /* Exact Light Vanilla Beige: 100% visible */
   --text-secondary:        #F5EBD8;      /* Clear high-contrast light vanilla cream */
-  --text-muted:            #D8CBBA;      /* Distinctly readable warm vanilla (not dull grey) */
+  --text-muted:            #E2D5C3;      /* High contrast warm beige (NOT dull, fully visible) */
   --text-inverse:          #0A122A;
 
   --line-navy:             #FFF7E6;      /* Solid Light Vanilla accent line */
   --line-navy-solid:       #FFF7E6;
 
-  --brand-primary:         #FFF7E6;      /* Vanilla pops on dark navy */
+  --brand-primary:         #FFF7E6;      /* Beige pops on dark navy */
   --brand-primary-dark:    #F3E5C8;
   --brand-accent:          #FFF7E6;
   --brand-gradient:        #FFF7E6;
   --brand-gradient-warm:   #FFF7E6;
+
+  --emerald-400:           #FFF7E6;      /* High contrast beige for dark mode text */
+  --emerald-500:           #FFF7E6;
+  --emerald-600:           #FFF7E6;
+  --blue-400:              #FFF7E6;
+  --blue-500:              #FFF7E6;
 
   --color-eat:             #FFF7E6;      /* Light Vanilla */
   --color-eat-subtle:      #F3E5C8;
