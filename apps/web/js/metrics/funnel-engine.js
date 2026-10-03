@@ -1,28 +1,59 @@
 /**
  * MealSense Funnel Engine
  * Dynamically evaluates conversion funnels by querying stored telemetry events.
- * Replaces hardcoded static funnel percentages.
+ * 
+ * Strict Measurement Standards:
+ * 1. Student Funnel Denominator: Unique student-meal pairs (not raw events).
+ * 2. On-Time Yield: Strictly verifies `is_late !== true` from event properties/payload.
+ * 3. Kitchen Funnel Denominator: Unique meal service IDs (prevents outcome > 100% anomaly).
  */
 
 export class FunnelEngine {
   /**
    * Computes the Student Participation Funnel from raw events.
+   * Denominator: Unique student × meal exposures.
    */
   getStudentFunnel(provider) {
-    const events = provider.getEvents();
+    const events = provider.getEvents() || [];
 
-    const countEvent = (name) => events.filter(e => e.event_name === name).length;
+    // Helper to extract student-meal pair key
+    const getStudentMealKey = (e) => {
+      const u = e.user_id || e.payload?.user_id || e.properties?.user_id;
+      const m = e.meal_id || e.payload?.meal_id || e.properties?.meal_id || 'active_meal';
+      return u ? `${u}::${m}` : null;
+    };
 
-    const views = countEvent('student.meal_viewed');
-    const starts = countEvent('student.response_started');
-    const submits = countEvent('student.response_submitted');
-    const late = countEvent('student.response_late');
-    const onTime = Math.max(0, submits - late);
+    const exposedSet = new Set();
+    const startedSet = new Set();
+    const submittedSet = new Set();
+    const onTimeSet = new Set();
 
-    // If completely empty in Live mode, show empty funnel
-    if (views === 0) {
+    events.forEach((e, idx) => {
+      const key = getStudentMealKey(e) || `event-${idx}`;
+      const isLate = e.properties?.is_late === true || e.payload?.is_late === true;
+
+      if (e.event_name === 'student.meal_viewed') {
+        exposedSet.add(key);
+      } else if (e.event_name === 'student.response_started') {
+        startedSet.add(key);
+      } else if (e.event_name === 'student.response_submitted') {
+        submittedSet.add(key);
+        if (!isLate) {
+          onTimeSet.add(key);
+        }
+      }
+    });
+
+    const views = exposedSet.size;
+    const starts = startedSet.size;
+    const submits = submittedSet.size;
+    const onTime = onTimeSet.size;
+
+    // Handle clean empty state
+    if (views === 0 && submits === 0) {
       return {
         hasData: false,
+        unit: 'Unique student-meal pairs',
         steps: [
           { name: '1. Meal Viewed', count: 0, pct: 0 },
           { name: '2. Response Started', count: 0, pct: 0 },
@@ -34,9 +65,10 @@ export class FunnelEngine {
       };
     }
 
-    const startPct = views > 0 ? Number(((starts / views) * 100).toFixed(1)) : 0;
-    const submitPct = views > 0 ? Number(((submits / views) * 100).toFixed(1)) : 0;
-    const onTimePct = views > 0 ? Number(((onTime / views) * 100).toFixed(1)) : 0;
+    const baseline = Math.max(1, views);
+    const startPct = Number(((starts / baseline) * 100).toFixed(1));
+    const submitPct = Number(((submits / baseline) * 100).toFixed(1));
+    const onTimePct = Number(((onTime / baseline) * 100).toFixed(1));
 
     const viewToResponseRate = views > 0 
       ? `${((submits / views) * 100).toFixed(1)}%` 
@@ -44,6 +76,7 @@ export class FunnelEngine {
 
     return {
       hasData: true,
+      unit: 'Unique student-meal pairs',
       steps: [
         { name: '1. Meal Viewed', count: views, pct: 100 },
         { name: '2. Response Started', count: starts, pct: Math.min(100, startPct) },
@@ -57,22 +90,50 @@ export class FunnelEngine {
 
   /**
    * Computes the Kitchen Decision-to-Outcome Funnel from raw events.
+   * Denominator: Unique meal service IDs.
    */
   getKitchenFunnel(provider) {
-    const events = provider.getEvents();
+    const events = provider.getEvents() || [];
 
-    const countEvent = (name) => events.filter(e => e.event_name === name).length;
+    const getMealId = (e) => e.meal_id || e.payload?.meal_id || e.properties?.meal_id || null;
 
-    const forecastViews = countEvent('kitchen.forecast_viewed');
-    const recReviews = countEvent('kitchen.recommendation_reviewed');
-    const recAccepted = countEvent('kitchen.recommendation_accepted');
-    const recAdjusted = countEvent('kitchen.recommendation_adjusted');
-    const decisions = recAccepted + recAdjusted;
-    const outcomes = countEvent('kitchen.outcome_submitted');
+    const forecastMeals = new Set();
+    const reviewMeals = new Set();
+    const decisionMeals = new Set();
+    const acceptedMeals = new Set();
+    const outcomeMeals = new Set();
+
+    events.forEach((e, idx) => {
+      const mId = getMealId(e) || `service-${idx}`;
+
+      if (e.event_name === 'kitchen.forecast_viewed') {
+        forecastMeals.add(mId);
+      } else if (e.event_name === 'kitchen.recommendation_reviewed') {
+        reviewMeals.add(mId);
+      } else if (e.event_name === 'kitchen.recommendation_accepted') {
+        decisionMeals.add(mId);
+        acceptedMeals.add(mId);
+      } else if (e.event_name === 'kitchen.recommendation_adjusted') {
+        decisionMeals.add(mId);
+      } else if (e.event_name === 'kitchen.outcome_submitted') {
+        outcomeMeals.add(mId);
+      }
+    });
+
+    const forecastViews = forecastMeals.size;
+    const recReviews = reviewMeals.size;
+    const decisions = decisionMeals.size;
+    const recAccepted = acceptedMeals.size;
+
+    // Guardrail: Outcomes in the sequence must have had a decision recorded
+    const validOutcomes = decisions > 0 
+      ? new Set([...outcomeMeals].filter(id => decisionMeals.has(id))).size
+      : outcomeMeals.size;
 
     if (forecastViews === 0 && decisions === 0) {
       return {
         hasData: false,
+        unit: 'Unique meal services',
         steps: [
           { name: '1. Forecast Viewed', count: 0, pct: 0 },
           { name: '2. Recommendation Reviewed', count: 0, pct: 0 },
@@ -89,16 +150,17 @@ export class FunnelEngine {
     const recPct = Number(((recReviews / baselineViews) * 100).toFixed(1));
     const decPct = Number(((decisions / baselineViews) * 100).toFixed(1));
     const acceptPct = decisions > 0 ? Number(((recAccepted / decisions) * 100).toFixed(1)) : 0;
-    const outPct = decisions > 0 ? Number(((outcomes / decisions) * 100).toFixed(1)) : 0;
+    const outPct = decisions > 0 ? Number(((validOutcomes / decisions) * 100).toFixed(1)) : 0;
 
     return {
       hasData: true,
+      unit: 'Unique meal services',
       steps: [
         { name: '1. Forecast Viewed', count: forecastViews, pct: 100 },
         { name: '2. Recommendation Reviewed', count: recReviews, pct: Math.min(100, recPct) },
         { name: '3. Decision Recorded', count: decisions, pct: Math.min(100, decPct) },
         { name: '4. Accepted Without Override', count: recAccepted, pct: Math.min(100, acceptPct), isTarget: true },
-        { name: '5. Post-Meal Outcome Logged', count: outcomes, pct: Math.min(100, outPct), isTarget: true }
+        { name: '5. Post-Meal Outcome Logged', count: validOutcomes, pct: Math.min(100, outPct), isTarget: true }
       ],
       acceptanceRate: `${acceptPct}%`,
       complianceRate: `${outPct}%`

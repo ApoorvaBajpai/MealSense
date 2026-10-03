@@ -113,7 +113,7 @@ export function createDemoSeed() {
       upperBound: predLunch + 14,
       modelVersion: 'v1-intent',
       confidenceLevel: 0.80,
-      sampleCount: 146
+      sampleCount: 70
     };
 
     kitchenDecisions[lunchId] = {
@@ -198,7 +198,7 @@ export function createDemoSeed() {
       upperBound: predDinner + 14,
       modelVersion: 'v1-intent',
       confidenceLevel: 0.80,
-      sampleCount: 146
+      sampleCount: 70
     };
 
     kitchenDecisions[dinnerId] = {
@@ -267,7 +267,7 @@ export function createDemoSeed() {
     upperBound: 362,
     modelVersion: 'v1-intent',
     confidenceLevel: 0.80,
-    sampleCount: 146
+    sampleCount: 70
   };
 
   kitchenDecisions['demo-today-lunch'] = {
@@ -311,7 +311,7 @@ export function createDemoSeed() {
     upperBound: 342,
     modelVersion: 'v1-intent',
     confidenceLevel: 0.80,
-    sampleCount: 146
+    sampleCount: 70
   };
 
   // --- DAY +1 (TOMORROW) ---
@@ -345,7 +345,7 @@ export function createDemoSeed() {
     upperBound: 280,
     modelVersion: 'v1-intent',
     confidenceLevel: 0.80,
-    sampleCount: 146
+    sampleCount: 70
   };
 
   const auditLogs = [

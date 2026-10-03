@@ -1,7 +1,17 @@
 # MealSense: Prototype Scope, Boundaries & Limitations
 
 > **Product Management Transparency Disclosure**  
-> Clear documentation of what MealSense implements as a portfolio prototype versus what is reserved for an enterprise production deployment.
+> MealSense is an interactive portfolio prototype designed to demonstrate closed-loop product strategy, metrics architecture, and kitchen operations. It is not an enterprise production deployment.
+
+### Current Prototype Limitations
+- **Browser-local authentication**: User accounts and session state reside in browser `localStorage`.
+- **Browser-local operational records**: Meals, intents, decisions, outcomes, and audit logs are stored locally.
+- **Intent-weighted prototype model**: Demand forecasting uses an intent-weighted linear heuristic with empirical variance bands.
+- **Target prediction intervals**: Displayed bounds are 80% target prediction intervals, not statistically validated finite-sample conformal coverage.
+- **Simulated demo experiments**: A/B testing metrics and p-values are synthetic demonstration benchmarks.
+- **Scenario cost savings**: Avoidable savings represent scenario estimates based on unserved portions avoided, not audited accounting savings.
+- **Non-causal correlation**: Causal impact of student intent signals on kitchen downsizing has not been experimentally isolated.
+- **Production prerequisites**: Institutional deployment requires backend database persistence, enterprise SSO (SAML/OIDC), server-side authorization, immutable audit infrastructure, and continuous model drift monitoring.
 
 ---
 

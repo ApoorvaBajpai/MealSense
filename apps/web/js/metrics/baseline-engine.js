@@ -1,7 +1,7 @@
 /**
  * MealSense Baseline Comparison Engine
  * Evaluates like-for-like operational changes against pre-implementation baseline.
- * Enforces defensible "Estimated Savings vs Baseline" formulas.
+ * Enforces defensible "Estimated Savings vs Baseline" formulas with ZERO silent fallbacks.
  */
 
 import { PROVENANCE } from './metric-definitions.js';
@@ -41,27 +41,36 @@ export class BaselineEngine {
       ? Number((((baselineOverprod - currentOverprod) / baselineOverprod) * 100).toFixed(1))
       : 0;
 
-    const baselineMae = Number(baseline.forecastMae);
+    const baselineMae = typeof baseline.forecastMae === 'number' ? Number(baseline.forecastMae) : null;
     const currentMae = Number(currentSummary.forecastMae) || 0;
-    const maeReductionPct = baselineMae > 0 && currentMae > 0
+    const maeReductionPct = (baselineMae !== null && baselineMae > 0 && currentMae > 0)
       ? Number((((baselineMae - currentMae) / baselineMae) * 100).toFixed(1))
-      : 0;
+      : null;
 
-    // Savings Calculation
-    // (baselineOverprodRate - currentOverprodRate)/100 * totalCookedServings * costPerServing
-    const costPerServing = Number(facility?.costPerServing || baseline.costPerServing || 42.00);
+    // Savings Calculation: (baselineOverprodRate - currentOverprodRate)/100 * totalCookedServings * costPerServing
+    const costPerServing = typeof facility?.costPerServing === 'number' 
+      ? facility.costPerServing 
+      : (typeof baseline.costPerServing === 'number' ? baseline.costPerServing : null);
+
     const cookedServings = currentSummary.totalCookedServings || 0;
 
     // Direct savings on observed meals
-    const observedAvoidedPlates = Math.max(0, ((baselineOverprod - currentOverprod) / 100) * cookedServings);
-    const observedSavings = Math.round(observedAvoidedPlates * costPerServing);
+    let observedAvoidedPlates = 0;
+    let observedSavings = null;
+    let estimatedMonthlySavings = null;
 
-    // Monthly scaled projection (e.g. 450 residents * 3 meals * 30 days = 40,500 monthly meals)
-    const monthlyMeals = (facility?.registeredCount || 450) * (facility?.mealsPerDay || 3) * 30;
-    const monthlyAvoidedPlates = Math.max(0, Math.round(((baselineOverprod - currentOverprod) / 100) * monthlyMeals));
-    const estimatedMonthlySavings = Math.round(monthlyAvoidedPlates * costPerServing);
+    if (costPerServing !== null && cookedServings > 0) {
+      observedAvoidedPlates = Math.max(0, ((baselineOverprod - currentOverprod) / 100) * cookedServings);
+      observedSavings = Math.round(observedAvoidedPlates * costPerServing);
 
-    const baselineShortage = typeof baseline.shortageRate === 'number' ? baseline.shortageRate : 0.0;
+      if (facility?.registeredCount && facility?.mealsPerDay) {
+        const monthlyMeals = facility.registeredCount * facility.mealsPerDay * 30;
+        const monthlyAvoidedPlates = Math.max(0, Math.round(((baselineOverprod - currentOverprod) / 100) * monthlyMeals));
+        estimatedMonthlySavings = Math.round(monthlyAvoidedPlates * costPerServing);
+      }
+    }
+
+    const baselineShortage = typeof baseline.shortageRate === 'number' ? Number(baseline.shortageRate) : null;
 
     return {
       hasBaseline: true,
@@ -85,7 +94,7 @@ export class BaselineEngine {
         baseline: baselineMae,
         current: currentMae,
         reductionPct: maeReductionPct,
-        improved: maeReductionPct > 0
+        improved: maeReductionPct !== null && maeReductionPct > 0
       },
       shortageRate: {
         baseline: baselineShortage,
@@ -96,7 +105,7 @@ export class BaselineEngine {
         costPerServing,
         observedAvoidedPlates: Math.round(observedAvoidedPlates),
         observedSavings,
-        estimatedMonthlySavings,
+        estimatedMonthlySavings: estimatedMonthlySavings ?? 0,
         provenance: PROVENANCE.SCENARIO,
         label: 'Scenario / Demo Estimate'
       }

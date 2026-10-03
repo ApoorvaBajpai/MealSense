@@ -55,11 +55,11 @@ export function renderAdminView(container) {
                 🏛️ ${facility.name || 'Institutional Mess'}
               </h2>
               <span class="badge badge-warning" style="font-size: 0.72rem;">
-                Live Mode • Awaiting First Records
+                Live Prototype • Awaiting First Records
               </span>
             </div>
             <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
-              Production Operational State • No seeded data
+              Live Prototype • Local Operational Records
             </span>
           </div>
           <div style="display: flex; gap: 8px;">
@@ -122,7 +122,7 @@ export function renderAdminView(container) {
               🏛️ ${facility.name}
             </h2>
             <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.72rem;">
-              ${isDemo ? 'Demo Evaluator Sandbox • Sample Data' : 'Live Mode • Local Operational Records'}
+              ${isDemo ? 'Demo Evaluator Sandbox • Sample Data' : 'Live Prototype • Local Operational Records'}
             </span>
           </div>
           <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
@@ -360,7 +360,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
               📈 Operational Trends & Trajectory
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
-              ${isDemo ? 'Example operational trend • Sample data' : 'Operational trend • Derived from logged meal outcomes'}
+              ${isDemo ? (tf === '90d' ? '90-day view · 35 days of seeded history (unrecorded periods display —)' : 'Dynamic trend · Calculated from 35-day demo records') : 'Operational trend · Derived from logged meal outcomes'}
             </span>
           </div>
           <!-- Timeframe Selector -->

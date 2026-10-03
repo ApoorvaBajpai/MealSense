@@ -77,7 +77,7 @@ Click **"🚀 Start 60-Second Guided Tour"** on the welcome portal to walk throu
 | Role | Persona & Name | Focus Area | Deep Link | Quick Login ID |
 |---|---|---|---|---|
 | **Student** | **Aarav Sharma** | One-tap intent & data-derived My Impact | `?mode=demo&role=student` | `student_testid` |
-| **Kitchen** | **Chef Rajesh Kumar** | Conformal forecast, override reasons & outcomes | `?mode=demo&role=kitchen` | `staff_testid` |
+| **Kitchen** | **Chef Rajesh Kumar** | Intent-weighted demand forecast (80% target interval), override reasons & outcomes | `?mode=demo&role=kitchen` | `staff_testid` |
 | **Admin** | **Dr. V. K. Verma** | Executive KPIs, trends, funnels & SaaS ROI | `?mode=demo&role=admin` | `admin_testid` |
 
 *Password for all demo accounts: `demo`*

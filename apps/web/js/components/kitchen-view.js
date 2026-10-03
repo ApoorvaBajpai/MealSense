@@ -72,7 +72,8 @@ export function renderKitchenView(container) {
 
   const selectedMeal = meals.find(m => m.id === store.selectedKitchenMealId) || meals[0];
   const intent = provider.getIntentCounts(selectedMeal.id);
-  const registered = selectedMeal.registeredSnapshot || provider.getFacility().registeredCount || 450;
+  const registered = selectedMeal.registeredSnapshot ?? provider.getFacility().registeredCount ?? 0;
+  const safeRegistered = Math.max(1, registered);
   const buffer = store.safetyBuffer;
 
   // Section 13.1: Forecast Service Source of Truth
@@ -116,9 +117,9 @@ export function renderKitchenView(container) {
   const prepTarget = isDecisionMade ? existingDecision.selectedQuantity : suggestedServings;
 
   // Prediction interval RangeBar percentages
-  const leftPct = Math.round((lower / registered) * 100);
-  const widthPct = Math.max(4, Math.round(((upper - lower) / registered) * 100));
-  const expectedPct = Math.round((predicted / registered) * 100);
+  const leftPct = Math.round((lower / safeRegistered) * 100);
+  const widthPct = Math.max(4, Math.round(((upper - lower) / safeRegistered) * 100));
+  const expectedPct = Math.round((predicted / safeRegistered) * 100);
 
   // Outcome status
   const outcome = provider.getOutcomes(selectedMeal.id);

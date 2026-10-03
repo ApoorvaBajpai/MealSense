@@ -9,66 +9,199 @@ export function generateDemoEvents() {
   const facilityId = 'demo-facility-ramanujan';
   const now = Date.now();
 
-  // Helper to add events over past 7 days
-  function addBatch(name, role, count, properties = {}, timeOffsetMinutes = 0) {
-    for (let i = 0; i < count; i++) {
-      const timestamp = new Date(now - (timeOffsetMinutes * 60000) - (i * 35000)).toISOString();
-      events.push({
-        event_name: name,
-        user_id: `demo-user-${(i % 50) + 1}`,
-        user_role: role,
-        facility_id: facilityId,
-        meal_id: 'demo-today-lunch',
-        session_id: `sess-demo-${(i % 30) + 1}`,
-        app_version: '2.0.0',
-        timestamp,
-        properties: {
-          ...properties,
-          provenance: 'demo_seeded_event'
-        }
-      });
-    }
+  // 1. Student Participation Funnel Events (Target: 424 viewed, 398 started, 372 submitted, 370 on-time)
+  // Step 1: meal_viewed (424 unique students)
+  for (let i = 0; i < 424; i++) {
+    events.push({
+      event_name: 'student.meal_viewed',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 120 * 60000 - i * 1000).toISOString(),
+      properties: { meal_type: 'lunch', provenance: 'demo_seeded_event' }
+    });
   }
 
-  // 1. Student Participation Funnel Events (Target: ~450 eligible students)
-  // Step 1: meal_viewed (424 events)
-  addBatch('student.meal_viewed', 'student', 424, { meal_type: 'lunch' }, 120);
+  // Step 2: response_started (398 unique students)
+  for (let i = 0; i < 398; i++) {
+    events.push({
+      event_name: 'student.response_started',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 110 * 60000 - i * 1000).toISOString(),
+      properties: { meal_type: 'lunch', provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // Step 2: response_started (398 events)
-  addBatch('student.response_started', 'student', 398, { meal_type: 'lunch' }, 110);
+  // Step 3: response_submitted (372 unique students: 318 eat on-time, 52 skip on-time, 2 eat late)
+  for (let i = 0; i < 318; i++) {
+    events.push({
+      event_name: 'student.response_submitted',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 90 * 60000 - i * 1000).toISOString(),
+      properties: { meal_type: 'lunch', response: 'eat', is_late: false, provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // Step 3: response_submitted (372 events: 318 eat, 52 skip, 2 late)
-  addBatch('student.response_submitted', 'student', 318, { meal_type: 'lunch', response: 'eat', is_late: false }, 90);
-  addBatch('student.response_submitted', 'student', 52, { meal_type: 'lunch', response: 'skip', is_late: false }, 85);
-  addBatch('student.response_submitted', 'student', 2, { meal_type: 'lunch', response: 'eat', is_late: true }, 10);
+  for (let i = 318; i < 370; i++) {
+    events.push({
+      event_name: 'student.response_submitted',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 85 * 60000 - (i - 318) * 1000).toISOString(),
+      properties: { meal_type: 'lunch', response: 'skip', is_late: false, provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // Response changed & late events
-  addBatch('student.response_changed', 'student', 14, { meal_type: 'lunch', from: 'eat', to: 'skip' }, 70);
-  addBatch('student.impact_viewed', 'student', 186, { section: 'my_impact' }, 60);
+  // 2 Late Submissions
+  for (let i = 370; i < 372; i++) {
+    events.push({
+      event_name: 'student.response_submitted',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 10 * 60000 - (i - 370) * 1000).toISOString(),
+      properties: { meal_type: 'lunch', response: 'eat', is_late: true, provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // 2. Kitchen Decision-to-Outcome Funnel Events (Target: 100 historical meal services)
-  // Step 1: forecast_viewed (100)
-  addBatch('kitchen.forecast_viewed', 'kitchen', 100, {}, 240);
+  // Response changed & Impact viewed
+  for (let i = 0; i < 14; i++) {
+    events.push({
+      event_name: 'student.response_changed',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 70 * 60000).toISOString(),
+      properties: { meal_type: 'lunch', from: 'eat', to: 'skip', provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // Step 2: recommendation_reviewed (100)
-  addBatch('kitchen.recommendation_reviewed', 'kitchen', 100, { model_version: 'v1-intent' }, 230);
+  for (let i = 0; i < 186; i++) {
+    events.push({
+      event_name: 'student.impact_viewed',
+      user_id: `student-${i + 1}`,
+      user_role: 'student',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-stu-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 60 * 60000).toISOString(),
+      properties: { section: 'my_impact', provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // Step 3: decision_recorded (96 decisions: 84 accepted, 12 adjusted)
-  addBatch('kitchen.recommendation_accepted', 'kitchen', 84, { delta: 0, reason: 'accepted_recommendation' }, 200);
-  addBatch('kitchen.recommendation_adjusted', 'kitchen', 12, { delta: 10, reason: 'higher_expected' }, 190);
+  // 2. Kitchen Decision-to-Outcome Funnel Events (Target: 100 services)
+  // Step 1: forecast_viewed (100 unique meal services)
+  for (let i = 0; i < 100; i++) {
+    events.push({
+      event_name: 'kitchen.forecast_viewed',
+      user_id: 'staff_testid',
+      user_role: 'kitchen',
+      facility_id: facilityId,
+      meal_id: `service-${i + 1}`,
+      session_id: `sess-kitch-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 240 * 60000 - i * 1000).toISOString(),
+      properties: { provenance: 'demo_seeded_event' }
+    });
+  }
 
-  // Step 4: outcome_submitted (98 outcomes logged)
-  addBatch('kitchen.outcome_started', 'kitchen', 98, {}, 60);
-  addBatch('kitchen.outcome_submitted', 'kitchen', 98, { shortage: false, surplus_disposition: 'refrigerated' }, 45);
+  // Step 2: recommendation_reviewed (100 unique meal services)
+  for (let i = 0; i < 100; i++) {
+    events.push({
+      event_name: 'kitchen.recommendation_reviewed',
+      user_id: 'staff_testid',
+      user_role: 'kitchen',
+      facility_id: facilityId,
+      meal_id: `service-${i + 1}`,
+      session_id: `sess-kitch-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 230 * 60000 - i * 1000).toISOString(),
+      properties: { model_version: 'v1-intent', provenance: 'demo_seeded_event' }
+    });
+  }
+
+  // Step 3: decisions (96 total: 84 accepted, 12 adjusted)
+  for (let i = 0; i < 84; i++) {
+    events.push({
+      event_name: 'kitchen.recommendation_accepted',
+      user_id: 'staff_testid',
+      user_role: 'kitchen',
+      facility_id: facilityId,
+      meal_id: `service-${i + 1}`,
+      session_id: `sess-kitch-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 200 * 60000 - i * 1000).toISOString(),
+      properties: { delta: 0, reason: 'accepted_recommendation', provenance: 'demo_seeded_event' }
+    });
+  }
+
+  for (let i = 84; i < 96; i++) {
+    events.push({
+      event_name: 'kitchen.recommendation_adjusted',
+      user_id: 'staff_testid',
+      user_role: 'kitchen',
+      facility_id: facilityId,
+      meal_id: `service-${i + 1}`,
+      session_id: `sess-kitch-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 190 * 60000 - (i - 84) * 1000).toISOString(),
+      properties: { delta: 10, reason: 'higher_expected', provenance: 'demo_seeded_event' }
+    });
+  }
+
+  // Step 4: outcome_submitted (94 outcomes logged, subset of 96 decisions)
+  for (let i = 0; i < 94; i++) {
+    events.push({
+      event_name: 'kitchen.outcome_submitted',
+      user_id: 'staff_testid',
+      user_role: 'kitchen',
+      facility_id: facilityId,
+      meal_id: `service-${i + 1}`,
+      session_id: `sess-kitch-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 45 * 60000 - i * 1000).toISOString(),
+      properties: { shortage: false, surplus_disposition: 'refrigerated', provenance: 'demo_seeded_event' }
+    });
+  }
 
   // 3. Admin Events
-  addBatch('admin.dashboard_viewed', 'admin', 42, { timeframe: '30d' }, 180);
-  addBatch('admin.insight_opened', 'admin', 28, { insight_id: 'lunch-waste-drop' }, 150);
-  addBatch('admin.report_exported', 'admin', 12, { format: 'csv' }, 100);
-
-  // 4. Experiment Exposures
-  addBatch('experiment.exposure', 'student', 210, { experiment_id: 'exp-01-value-prop', variant: 'A' }, 300);
-  addBatch('experiment.exposure', 'student', 214, { experiment_id: 'exp-01-value-prop', variant: 'B' }, 300);
+  for (let i = 0; i < 42; i++) {
+    events.push({
+      event_name: 'admin.dashboard_viewed',
+      user_id: 'admin_testid',
+      user_role: 'admin',
+      facility_id: facilityId,
+      meal_id: 'demo-today-lunch',
+      session_id: `sess-admin-${i + 1}`,
+      app_version: '2.0.0',
+      timestamp: new Date(now - 180 * 60000).toISOString(),
+      properties: { timeframe: '30d', provenance: 'demo_seeded_event' }
+    });
+  }
 
   return events;
 }

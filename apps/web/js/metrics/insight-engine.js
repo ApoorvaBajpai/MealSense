@@ -30,7 +30,7 @@ export class InsightEngine {
           badgeLabel: 'Operational Trend',
           badgeType: 'badge-eat',
           title: `📉 Avoidable Food Waste Down ${redPct}% vs. Baseline Period`,
-          explanation: `Trailing services average ${metricSummary.wastePerMealKg} kg/meal of unserved surplus compared to ${baselineComparison.wastePerMeal.baseline} kg/meal during the pre-implementation audit period. This reduction is associated with advance student intent submissions enabling batch downsizing.`,
+          explanation: `Trailing services average ${metricSummary.wastePerMealKg} kg/meal of unserved surplus compared to ${baselineComparison.wastePerMeal.baseline} kg/meal during the pre-implementation audit period. The current period shows lower unserved surplus alongside advance student intent signals. Controlled experimentation would be required to attribute the reduction specifically to intent-based preparation.`,
           metric: 'wastePerMealKg',
           currentValue: `${metricSummary.wastePerMealKg} kg/meal`,
           comparisonValue: `${baselineComparison.wastePerMeal.baseline} kg/meal`,
@@ -82,7 +82,7 @@ export class InsightEngine {
           comparisonValue: `±${Math.round(weekdayStd)} diners (Weekday)`,
           sampleSize: fridayDinners.length + weekdayDinners.length,
           privacySuppressed: false,
-          actionLink: 'Adjust Friday dinner buffer targets by -6 to -10 servings to account for departure volatility.'
+          actionLink: 'Review Friday dinner safety-buffer settings.'
         });
       }
     }
@@ -128,22 +128,6 @@ export class InsightEngine {
         });
       }
     }
-
-    // Rule 4: Small-Group Privacy Suppression Rule (Section 9 / 16.1)
-    insights.push({
-      id: 'ins-privacy-suppression',
-      type: 'privacy',
-      badgeLabel: 'Privacy Protocol',
-      badgeType: 'badge-eat',
-      title: '🔒 Small-Group Privacy Suppression Protocol Active',
-      explanation: 'Block C (Wing 4) Intent Breakdown: [ Insufficient data to display this breakdown — 3 responses ]. Sub-group aggregations with fewer than 5 active responses are suppressed across administrative views to prevent resident re-identification.',
-      metric: 'privacyRule',
-      currentValue: 'Threshold: N ≥ 5',
-      comparisonValue: 'Suppressed: N = 3',
-      sampleSize: 3,
-      privacySuppressed: true,
-      actionLink: 'Privacy guardrail enforced in accordance with privacy-conscious architectural standards.'
-    });
 
     return insights;
   }

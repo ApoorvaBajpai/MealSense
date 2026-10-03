@@ -222,10 +222,12 @@ export class TrendEngine {
 
       case 'responseRate':
         if (intent && (typeof intent.nEat === 'number' || typeof intent.nSkip === 'number')) {
-          const registered = meal.registeredSnapshot || facility?.registeredCount || 450;
-          return Number((((intent.nEat || 0) + (intent.nSkip || 0)) / registered * 100).toFixed(1));
+          const registered = meal.registeredSnapshot ?? facility?.registeredCount;
+          if (typeof registered === 'number' && registered > 0) {
+            return Number((((intent.nEat || 0) + (intent.nSkip || 0)) / registered * 100).toFixed(1));
+          }
         }
-        return null; // Return null when intent telemetry is absent (no fake fallbacks!)
+        return null; // Return null when intent telemetry or registered count is absent (no fake fallbacks!)
 
       case 'shortageRate':
         return outcome.ranShort ? 100.0 : 0.0;

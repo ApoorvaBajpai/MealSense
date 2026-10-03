@@ -131,8 +131,8 @@ export class MetricEngine {
 
     meals.forEach(m => {
       const intent = intentCountsMap[m.id];
-      const registered = m.registeredSnapshot || facility.registeredCount || 450;
-      if (intent && registered > 0) {
+      const registered = m.registeredSnapshot ?? facility.registeredCount;
+      if (intent && typeof registered === 'number' && registered > 0) {
         totalEligible += registered;
         totalOnTimeResponses += (intent.nEat || 0) + (intent.nSkip || 0);
       }
