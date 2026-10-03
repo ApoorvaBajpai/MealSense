@@ -140,7 +140,7 @@ export class MetricEngine {
 
     const onTimeResponseRate = totalEligible > 0 
       ? Number(((totalOnTimeResponses / totalEligible) * 100).toFixed(1))
-      : 0.0;
+      : null;
 
     // 8. Kitchen Recommendation Acceptance Rate
     const decisionsList = Object.values(decisionsMap || {});

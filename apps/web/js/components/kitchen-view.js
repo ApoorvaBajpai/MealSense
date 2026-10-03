@@ -224,13 +224,37 @@ export function renderKitchenView(container) {
 
           <!-- Section 13.2: Decision-First Screen Recommendation -->
           <div style="background: linear-gradient(135deg, rgba(184, 93, 56, 0.08) 0%, rgba(156, 75, 40, 0.04) 100%); border: 2px solid var(--brand-accent); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
               <span style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: var(--brand-primary); letter-spacing: 0.05em;">
-                🎯 Recommended Preparation Quantity
+                🎯 Intent-Weighted Demand Forecast
               </span>
-              <span style="font-size: 0.78rem; background: var(--bg-surface); padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); color: var(--text-secondary);">
-                Expected Turnout: <strong>${predicted}</strong> | Likely Range: <strong>${lower}–${upper}</strong>
+              <span class="badge" style="font-size: 0.72rem; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-secondary);">
+                Model: <strong>${modelVersion}</strong> · Target Coverage: 80%
               </span>
+            </div>
+
+            <!-- Key Forecast & Buffer Metrics Strip -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0 16px;">
+              <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Expected Turnout</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">${predicted}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">projected diners</div>
+              </div>
+              <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Target Prediction Interval</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: var(--brand-primary); margin-top: 2px;">${lower}–${upper}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">80% target interval</div>
+              </div>
+              <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Safety Buffer</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: var(--color-eat); margin-top: 2px;">+${bufferServings}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">guardrail cushion</div>
+              </div>
+              <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--brand-accent);">
+                <div style="font-size: 0.7rem; color: var(--brand-primary); font-weight: 700; text-transform: uppercase;">Recommended Prep</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: var(--brand-primary); margin-top: 2px;">${suggestedServings}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">servings target</div>
+              </div>
             </div>
 
             <div style="display: flex; align-items: baseline; gap: 12px; margin: 12px 0;">
@@ -272,9 +296,24 @@ export function renderKitchenView(container) {
           <!-- Section 8.2: Expandable Advanced Forecast Details Accordion -->
           <details style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px; border: 1px solid var(--border-subtle);">
             <summary style="font-size: 0.88rem; font-weight: 800; color: var(--brand-primary); cursor: pointer; user-select: none;">
-              🔍 Forecast Provenance & Model Specification (${modelVersion})
+              🔍 Forecast Basis & Model Explainability (${modelVersion})
             </summary>
             <div style="margin-top: 14px;">
+              <!-- Explainability Breakdown Card -->
+              <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
+                <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary); margin-bottom: 8px;">
+                  📋 Forecast Basis (${capitalize(selectedMeal.type)}):
+                </div>
+                <ul style="margin: 0; padding-left: 20px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;">
+                  <li><strong>${intent.nEat || 0}</strong> Eat responses signaled in advance</li>
+                  <li><strong>${intent.nSkip || 0}</strong> Skip responses confirmed before cutoff</li>
+                  <li><strong>${intent.nLate || 0}</strong> Late responses received post-cutoff</li>
+                  <li><strong>${Math.max(0, registered - (intent.nEat || 0) - (intent.nSkip || 0) - (intent.nLate || 0))}</strong> unresponded enrolled residents</li>
+                  <li>Historical attendance patterns for <strong>${formatDate(selectedMeal.mealDate).split(',')[0]}</strong></li>
+                  <li>Active Model: <code>${modelVersion}</code> (${modelVersion === 'v0-naive' ? 'Heuristic cold-start' : 'Intent-weighted operational forecast'})</li>
+                </ul>
+              </div>
+
               <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px;">
                 <div><strong>Model Version:</strong> <code>${modelVersion}</code> — ${modelVersion === 'v0-naive' ? 'Cold-start heuristic baseline' : 'Intent-weighted operational forecast'}</div>
                 <div><strong>Coverage Specification:</strong> ${modelVersion === 'v0-naive' ? 'Heuristic interval (Cold start: ±5% of registered diners)' : '80% target prediction interval (Historical variance band)'}</div>
@@ -285,11 +324,12 @@ export function renderKitchenView(container) {
 
               <!-- Product Cold-Start Progression Pipeline Info -->
               <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 14px; font-size: 0.78rem; color: var(--text-secondary);">
-                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">📈 Cold-Start Model Progression:</div>
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">📈 Forecast Maturity Roadmap:</div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <span class="badge ${sampleCount < 6 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">0–5 meals: v0-naive heuristic</span>
-                  <span class="badge ${sampleCount >= 6 && sampleCount < 20 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">6–20 meals: v1-intent weighted</span>
-                  <span class="badge ${sampleCount >= 20 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">20+ meals: v2 calibrated intervals</span>
+                  <span class="badge ${sampleCount < 6 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">v0 — Cold-start heuristic (0–5 meals)</span>
+                  <span class="badge ${sampleCount >= 6 && sampleCount < 20 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">v1 — Intent-weighted forecast (6–20 meals)</span>
+                  <span class="badge ${sampleCount >= 20 ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.7rem;">v2 — Residual-calibrated intervals (20–50 meals)</span>
+                  <span class="badge badge-primary" style="font-size: 0.7rem;">v3 — Conformal calibration (50+ meals)</span>
                 </div>
               </div>
 

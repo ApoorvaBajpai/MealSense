@@ -16,11 +16,12 @@ export class FunnelEngine {
   getStudentFunnel(provider) {
     const events = provider.getEvents() || [];
 
-    // Helper to extract student-meal pair key
+    // Helper to extract student-meal pair key (strictly requires both userId and mealId)
     const getStudentMealKey = (e) => {
-      const u = e.user_id || e.payload?.user_id || e.properties?.user_id;
-      const m = e.meal_id || e.payload?.meal_id || e.properties?.meal_id || 'active_meal';
-      return u ? `${u}::${m}` : null;
+      const userId = e.user_id || e.payload?.user_id || e.properties?.user_id;
+      const mealId = e.meal_id || e.payload?.meal_id || e.properties?.meal_id;
+      if (!userId || !mealId) return null;
+      return `${userId}::${mealId}`;
     };
 
     const exposedSet = new Set();
@@ -28,8 +29,9 @@ export class FunnelEngine {
     const submittedSet = new Set();
     const onTimeSet = new Set();
 
-    events.forEach((e, idx) => {
-      const key = getStudentMealKey(e) || `event-${idx}`;
+    events.forEach(e => {
+      const key = getStudentMealKey(e);
+      if (!key) return;
       const isLate = e.properties?.is_late === true || e.payload?.is_late === true;
 
       if (e.event_name === 'student.meal_viewed') {
@@ -103,8 +105,9 @@ export class FunnelEngine {
     const acceptedMeals = new Set();
     const outcomeMeals = new Set();
 
-    events.forEach((e, idx) => {
-      const mId = getMealId(e) || `service-${idx}`;
+    events.forEach(e => {
+      const mId = getMealId(e);
+      if (!mId) return;
 
       if (e.event_name === 'kitchen.forecast_viewed') {
         forecastMeals.add(mId);

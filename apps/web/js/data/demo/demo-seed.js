@@ -113,6 +113,7 @@ export function createDemoSeed() {
       upperBound: predLunch + 14,
       modelVersion: 'v1-intent',
       confidenceLevel: 0.80,
+      intervalTarget: 0.80,
       sampleCount: 70
     };
 
@@ -198,6 +199,7 @@ export function createDemoSeed() {
       upperBound: predDinner + 14,
       modelVersion: 'v1-intent',
       confidenceLevel: 0.80,
+      intervalTarget: 0.80,
       sampleCount: 70
     };
 
@@ -267,6 +269,7 @@ export function createDemoSeed() {
     upperBound: 362,
     modelVersion: 'v1-intent',
     confidenceLevel: 0.80,
+    intervalTarget: 0.80,
     sampleCount: 70
   };
 
@@ -311,6 +314,7 @@ export function createDemoSeed() {
     upperBound: 342,
     modelVersion: 'v1-intent',
     confidenceLevel: 0.80,
+    intervalTarget: 0.80,
     sampleCount: 70
   };
 
@@ -345,6 +349,7 @@ export function createDemoSeed() {
     upperBound: 280,
     modelVersion: 'v1-intent',
     confidenceLevel: 0.80,
+    intervalTarget: 0.80,
     sampleCount: 70
   };
 

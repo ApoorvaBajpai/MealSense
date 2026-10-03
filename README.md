@@ -20,7 +20,7 @@ Institutional dining facilities face a classic operational mismatch: kitchen sta
 
 **MealSense addresses the root cause of overproduction: uncertainty and asymmetric risk.** Rather than treating food waste as a pure theoretical machine learning problem, MealSense designs a closed human decision loop:
 1. **Lightweight Student Signal**: Students signal intent in 1 tap ($< 3\text{s}$ latency) before the preparation cutoff.
-2. **Target Demand Forecast**: Calibrated uncertainty intervals ($80\%$ target prediction interval) replace unassisted gut-feel guesswork.
+2. **Intent-Weighted Demand Forecast**: Student meal intent and historical attendance generate an expected turnout estimate with an 80% target prediction interval.
 3. **Decision-First Kitchen UX**: Recommends an exact cooking quantity (`Expected Turnout + Safety Buffer = Servings`) while logging adjustment reasons.
 4. **Post-Meal Waste Auditing**: Simple 60-second outcome capture logs actual attendance, unserved tray waste, plate scrapings, and shortage status.
 5. **Continuous Insights & Defensible Savings**: A centralized Metrics Engine aggregates trends, conversion funnels, and defensible savings against an audited baseline.
@@ -165,7 +165,7 @@ mealsense/
 │   │
 │   └── technical/
 │       ├── architecture.md           # One product, two modes data architecture
-│       ├── forecasting.md            # Conformal prediction engine & cold-start progression
+│       ├── forecasting.md            # Intent-weighted forecasting & interval calibration roadmap
 │       └── data-model.md             # PostgreSQL schema (baselines, decisions, outcomes)
 ```
 

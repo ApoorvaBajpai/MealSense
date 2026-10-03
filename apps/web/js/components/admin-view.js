@@ -276,10 +276,16 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
             <span class="kpi-label">Student On-Time Response</span>
             <span class="badge badge-eat" style="font-size: 0.68rem;">Signal</span>
           </div>
-          <div class="kpi-value">${metrics.onTimeResponseRate}%</div>
-          <span class="kpi-delta delta-good">
-            ↑ ${metrics.responseRateDelta >= 0 ? '+' : ''}${metrics.responseRateDelta} pp vs baseline (${metrics.baselineResponseRate}%)
-          </span>
+          <div class="kpi-value">${metrics.onTimeResponseRate !== null ? `${metrics.onTimeResponseRate}%` : '—'}</div>
+          ${metrics.onTimeResponseRate !== null ? `
+            <span class="kpi-delta delta-good">
+              ${isDemo ? '↑ +22.0 pp vs pre-launch baseline (56.0%)' : 'Active dining cohort participation'}
+            </span>
+          ` : `
+            <span class="kpi-delta" style="color: var(--text-muted);">
+              Insufficient enrollment data
+            </span>
+          `}
           <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
             Provenance: On-time student responses / eligible dining count
           </div>
@@ -740,6 +746,53 @@ function renderGovernanceTab({ facility, accounts, students, isDemo }) {
               `).join('')}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Privacy & Data Governance Controls -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">
+              🛡️ Privacy Controls & Data Governance
+            </h3>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">
+              Institutional privacy safeguards enforced across analytics, reporting, and kitchen workflows
+            </span>
+          </div>
+          <span class="badge badge-eat" style="font-size: 0.74rem;">Status: Active</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+          <div style="background: var(--bg-surface); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); border-left: 3px solid var(--color-eat);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="color: var(--color-eat); font-weight: 800;">✓</span>
+              <strong style="font-size: 0.88rem; color: var(--text-primary);">Small-Group Suppression</strong>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+              Subgroups below threshold (N &lt; 5) are automatically hidden from aggregate breakdowns to prevent student re-identification.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); border-left: 3px solid var(--color-eat);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="color: var(--color-eat); font-weight: 800;">✓</span>
+              <strong style="font-size: 0.88rem; color: var(--text-primary);">Anonymous Intent Aggregation</strong>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+              Kitchen staff view only aggregate Eat / Skip / Late volume counts. Individual resident identities are never exposed in preparation queues.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); border-left: 3px solid var(--color-eat);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="color: var(--color-eat); font-weight: 800;">✓</span>
+              <strong style="font-size: 0.88rem; color: var(--text-primary);">No Individual Dietary Visibility</strong>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+              Individual student dietary preferences and personal eating histories remain private and are not visible in public rosters.
+            </p>
+          </div>
         </div>
       </div>
 

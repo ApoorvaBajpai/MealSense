@@ -269,6 +269,7 @@ export class DemoDataProvider {
       upperBound: Math.round(this.facility.registeredCount * 0.80),
       modelVersion: 'v0-naive',
       confidenceLevel: 0.80,
+      intervalTarget: 0.80,
       sampleCount: Object.keys(this.outcomes).length,
       generatedAt: new Date().toISOString()
     };

@@ -296,18 +296,22 @@ function testFunnelEngineTelemetry() {
   const engine = new FunnelEngine();
   const provider = new MockDataProvider({
     events: [
+      { event_name: 'student.meal_viewed', user_id: 's1', meal_id: 'm1' },
+      { event_name: 'student.meal_viewed', user_id: 's2', meal_id: 'm1' },
+      // Duplicate view from same student on same meal: must deduplicate to 1
+      { event_name: 'student.meal_viewed', user_id: 's1', meal_id: 'm1' },
+      // Missing identifiers: must be safely ignored without fabricating 'active_meal'
       { event_name: 'student.meal_viewed' },
-      { event_name: 'student.meal_viewed' },
-      { event_name: 'student.response_started' },
-      { event_name: 'student.response_submitted', payload: { is_late: false } },
-      { event_name: 'kitchen.forecast_viewed' },
-      { event_name: 'kitchen.recommendation_reviewed' },
-      { event_name: 'kitchen.recommendation_accepted' }
+      { event_name: 'student.response_started', user_id: 's1', meal_id: 'm1' },
+      { event_name: 'student.response_submitted', user_id: 's1', meal_id: 'm1', payload: { is_late: false } },
+      { event_name: 'kitchen.forecast_viewed', meal_id: 'm1' },
+      { event_name: 'kitchen.recommendation_reviewed', meal_id: 'm1' },
+      { event_name: 'kitchen.recommendation_accepted', meal_id: 'm1' }
     ]
   });
 
   const studentFunnel = engine.getStudentFunnel(provider);
-  assertEqual(studentFunnel.steps[0].count, 2, '2 meal views');
+  assertEqual(studentFunnel.steps[0].count, 2, '2 unique student-meal views (deduped)');
   assertEqual(studentFunnel.steps[1].count, 1, '1 response started');
   assertEqual(studentFunnel.steps[2].count, 1, '1 response submitted');
 
