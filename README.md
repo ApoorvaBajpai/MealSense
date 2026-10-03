@@ -23,7 +23,7 @@ Institutional dining facilities face a classic operational mismatch: kitchen sta
 2. **Intent-Weighted Demand Forecast**: Student meal intent and historical attendance generate an expected turnout estimate with an 80% target prediction interval.
 3. **Decision-First Kitchen UX**: Recommends an exact cooking quantity (`Expected Turnout + Safety Buffer = Servings`) while logging adjustment reasons.
 4. **Post-Meal Waste Auditing**: Simple 60-second outcome capture logs actual attendance, unserved tray waste, plate scrapings, and shortage status.
-5. **Continuous Insights & Baseline Comparison**: A centralized Metrics Engine aggregates trends, conversion funnels, and estimated savings against a defined pre-implementation baseline.
+5. **Continuous Insights & Defensible Savings**: A centralized Metrics Engine aggregates trends, conversion funnels, and defensible savings against a defined pre-implementation baseline.
 
 ---
 

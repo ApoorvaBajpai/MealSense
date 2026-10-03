@@ -501,7 +501,7 @@ function renderAnalyticsTab({ studentFunnel, kitchenFunnel, experiments, isDemo 
           </div>
           <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; display: flex; justify-content: space-between;">
             <span>View-to-Response Rate: <strong>${studentFunnel.viewToResponseRate}</strong></span>
-            <span>Events: <strong>${studentFunnel.sampleCount}</strong></span>
+            <span>Sample: <strong>${studentFunnel.sampleCount} student-meal pairs</strong></span>
           </div>
         </div>
 
@@ -520,7 +520,7 @@ function renderAnalyticsTab({ studentFunnel, kitchenFunnel, experiments, isDemo 
           </div>
           <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; display: flex; justify-content: space-between;">
             <span>Cook Adoption Trust Ratio: <strong>${kitchenFunnel.acceptanceRate}</strong></span>
-            <span>Events: <strong>${kitchenFunnel.sampleCount}</strong></span>
+            <span>Sample: <strong>${kitchenFunnel.sampleCount} meal services</strong></span>
           </div>
         </div>
       </div>

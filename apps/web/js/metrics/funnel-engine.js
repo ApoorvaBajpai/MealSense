@@ -79,6 +79,7 @@ export class FunnelEngine {
     return {
       hasData: true,
       unit: 'Unique student-meal pairs',
+      sampleCount: submits,
       steps: [
         { name: '1. Meal Viewed', count: views, pct: 100 },
         { name: '2. Response Started', count: starts, pct: Math.min(100, startPct) },
@@ -158,6 +159,7 @@ export class FunnelEngine {
     return {
       hasData: true,
       unit: 'Unique meal services',
+      sampleCount: forecastViews,
       steps: [
         { name: '1. Forecast Viewed', count: forecastViews, pct: 100 },
         { name: '2. Recommendation Reviewed', count: recReviews, pct: Math.min(100, recPct) },
