@@ -79,7 +79,7 @@ export class FunnelEngine {
     return {
       hasData: true,
       unit: 'Unique student-meal pairs',
-      sampleCount: submits,
+      sampleCount: views,
       steps: [
         { name: '1. Meal Viewed', count: views, pct: 100 },
         { name: '2. Response Started', count: starts, pct: Math.min(100, startPct) },

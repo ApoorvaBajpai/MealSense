@@ -23,7 +23,7 @@ Institutional dining facilities face a classic operational mismatch: kitchen sta
 2. **Intent-Weighted Demand Forecast**: Student meal intent and historical attendance generate an expected turnout estimate with an 80% target prediction interval.
 3. **Decision-First Kitchen UX**: Recommends an exact cooking quantity (`Expected Turnout + Safety Buffer = Servings`) while logging adjustment reasons.
 4. **Post-Meal Waste Auditing**: Simple 60-second outcome capture logs actual attendance, unserved tray waste, plate scrapings, and shortage status.
-5. **Continuous Insights & Defensible Savings**: A centralized Metrics Engine aggregates trends, conversion funnels, and defensible savings against a defined pre-implementation baseline.
+5. **Continuous Insights & Estimated Savings**: A centralized Metrics Engine aggregates trends, conversion funnels, and estimated savings against a defined pre-implementation baseline.
 
 ---
 
@@ -102,7 +102,7 @@ $$\text{Shortage Rate} = \frac{\text{Meals with Shortage}}{\text{Total Meals Ser
 $$\text{Overproduction Rate} = \frac{\max(\text{prepared} - \text{actual}, 0)}{\text{prepared}} \times 100$$
 - **Demo Performance**: $4.20\%$ (Reduced from $6.10\%$ baseline).
 
-### 4. Defensible Savings Methodology
+### 4. Estimated Savings Methodology
 To withstand administrative and financial scrutiny, MealSense uses **"Estimated Savings vs. Baseline"** instead of arbitrary claims:
 $$\text{Estimated Savings} = (\text{Baseline Overprod \%} - \text{Current Overprod \%}) \times \text{Cooked Servings} \times \text{Raw Portion Cost}$$
 *Demo reference baseline: August 1–31, 2026 (Unassisted cooking @ ₹42.00/serving raw portion cost).*
