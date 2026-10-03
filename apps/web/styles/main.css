@@ -24,20 +24,14 @@ body {
   flex-direction: column;
   overflow-x: hidden;
   transition: background-color var(--transition-smooth), color var(--transition-smooth);
-  /* Luminous Light Vanilla canvas with subtle Midnight Navy ambiance */
-  background-image: 
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(10, 18, 42, 0.05) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(243, 229, 200, 0.40) 0%, transparent 60%);
 }
 
 /* ════════════════════════════════════════════════════════════
    HEADER & NAVIGATION
    ════════════════════════════════════════════════════════════ */
 .app-header {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  border-bottom: 1.5px solid var(--border-default);
   padding: 0 24px;
   height: 60px;
   position: sticky;
@@ -57,7 +51,6 @@ body {
   right: 0;
   height: 2px;
   background: var(--line-navy);
-  opacity: 0.95;
 }
 
 /* Brand */
@@ -75,7 +68,7 @@ body {
 .brand-icon {
   width: 34px;
   height: 34px;
-  background: linear-gradient(135deg, #0A122A 0%, #15234E 100%);
+  background: #0A122A;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -84,14 +77,17 @@ body {
   box-shadow: 0 0 0 1.5px rgba(10, 18, 42, 0.35), 0 4px 14px rgba(10, 18, 42, 0.25);
   position: relative;
   overflow: hidden;
+  color: #FFF7E6;
+}
+
+[data-theme="dark"] .brand-icon {
+  background: #FFF7E6;
+  color: #0A122A;
+  box-shadow: 0 0 0 1.5px rgba(255, 247, 230, 0.40), 0 4px 14px rgba(0, 0, 0, 0.40);
 }
 
 .brand-icon::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(145deg, rgba(255,255,255,0.22) 0%, transparent 60%);
-  border-radius: inherit;
+  display: none;
 }
 
 .brand-name-group {
@@ -105,10 +101,7 @@ body {
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #0A122A 0%, #15234E 50%, #1F3472 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0A122A;
   line-height: 1.15;
 }
 
@@ -122,9 +115,7 @@ body {
 }
 
 [data-theme="dark"] .brand-title {
-  background: linear-gradient(135deg, #FFF7E6 0%, #F3E5C8 50%, #FFFFFF 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
+  color: #FFF7E6;
 }
 
 /* User & Session Navigation */
@@ -154,10 +145,19 @@ body {
   box-shadow: 0 2px 10px rgba(10, 18, 42, 0.12);
 }
 
+[data-theme="dark"] .user-profile-badge {
+  background: var(--bg-surface);
+  border-color: rgba(255, 247, 230, 0.25);
+}
+
+[data-theme="dark"] .user-profile-badge:hover {
+  border-color: #FFF7E6;
+}
+
 .user-avatar {
   width: 26px;
   height: 26px;
-  background: linear-gradient(135deg, #0A122A 0%, #15234E 100%);
+  background: #0A122A;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -167,6 +167,12 @@ body {
   color: #FFF7E6;
   box-shadow: 0 0 0 2px rgba(10, 18, 42, 0.25);
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .user-avatar {
+  background: #FFF7E6;
+  color: #0A122A;
+  box-shadow: 0 0 0 2px rgba(255, 247, 230, 0.30);
 }
 
 .user-role-tag {
@@ -240,11 +246,11 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,0.025) 0%, transparent 50%);
+  background: transparent;
   pointer-events: none;
 }
 
-/* Hairline gradient royal blue accent line along card tops */
+/* Hairline solid navy accent line along card tops */
 .card::after {
   content: '';
   position: absolute;
@@ -345,23 +351,38 @@ body {
   transform: scale(0.97);
 }
 
-/* Primary — Gradient Navy Blue (Vibrant & Punchy) */
+/* Primary — Solid Midnight Navy */
 .btn-primary {
-  background: var(--brand-gradient);
-  color: #FFFFFF;
-  box-shadow: 0 4px 16px rgba(21, 58, 107, 0.35), 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(9, 30, 58, 0.30);
+  background: #0A122A;
+  color: #FFF7E6;
+  box-shadow: 0 4px 14px rgba(10, 18, 42, 0.25), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid #0A122A;
   font-weight: 800;
   letter-spacing: -0.01em;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 8px 24px rgba(21, 58, 107, 0.45), 0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.30);
-  filter: brightness(1.08);
+  background: #15234E;
+  border-color: #15234E;
+  color: #FFFFFF;
+  box-shadow: 0 8px 24px rgba(10, 18, 42, 0.35), 0 2px 6px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
 }
 
 .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+[data-theme="dark"] .btn-primary {
+  background: #FFF7E6;
+  color: #0A122A;
+  border-color: #FFF7E6;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.40);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #0A122A;
+}
 
 /* Secondary — Crisp elevated button with Midnight Navy outline */
 .btn-secondary {
@@ -683,8 +704,12 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--emerald-glow-soft), transparent);
+  height: 2px;
+  background: #0A122A;
+}
+
+[data-theme="dark"] .modal-content::before {
+  background: #FFF7E6;
 }
 
 .modal-header {
@@ -758,24 +783,21 @@ body {
 .auth-brand-icon {
   width: 64px;
   height: 64px;
-  background: var(--brand-gradient);
+  background: #0A122A;
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.9rem;
   margin: 0 auto 14px;
-  box-shadow: 0 0 0 1px rgba(10, 25, 47, 0.20), 0 8px 32px var(--emerald-glow);
+  box-shadow: 0 0 0 1px rgba(10, 25, 47, 0.20), 0 8px 24px rgba(10, 18, 42, 0.25);
   position: relative;
   overflow: hidden;
+  color: #FFF7E6;
 }
 
 .auth-brand-icon::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(145deg, rgba(255,255,255,0.20) 0%, transparent 55%);
-  border-radius: inherit;
+  display: none;
 }
 
 .auth-heading {
@@ -783,18 +805,19 @@ body {
   font-size: 2.1rem;
   font-weight: 900;
   letter-spacing: -0.04em;
-  background: linear-gradient(135deg, #0A122A 0%, #15234E 50%, #1F3472 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0A122A;
   margin-bottom: 6px;
   line-height: 1.1;
 }
 
+[data-theme="dark"] .auth-brand-icon {
+  background: #FFF7E6;
+  color: #0A122A;
+  box-shadow: 0 0 0 1px rgba(255, 247, 230, 0.30), 0 8px 24px rgba(0, 0, 0, 0.40);
+}
+
 [data-theme="dark"] .auth-heading {
-  background: linear-gradient(135deg, #FFF7E6 0%, #F3E5C8 60%, #FFFFFF 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
+  color: #FFF7E6;
 }
 
 .auth-tagline {
@@ -828,21 +851,22 @@ body {
 }
 
 .auth-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,0.02) 0%, transparent 50%);
-  pointer-events: none;
+  display: none;
 }
 
 /* Tour CTA Card — Premium Featured */
 .auth-tour-card {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F0F6FF 100%);
-  border: 1.5px solid #93C5FD;
-  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+  background: #FFFFFF;
+  border: 1.5px solid #0A122A;
+  box-shadow: 0 8px 24px rgba(10, 18, 42, 0.10), 0 2px 6px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
+}
+
+[data-theme="dark"] .auth-tour-card {
+  background: #16234B;
+  border: 1.5px solid rgba(255, 247, 230, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.40);
 }
 
 .auth-tour-card::after {
@@ -852,7 +876,11 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--brand-gradient);
+  background: #0A122A;
+}
+
+[data-theme="dark"] .auth-tour-card::after {
+  background: #FFF7E6;
 }
 
 .auth-tour-card .tour-eyebrow {
@@ -922,12 +950,7 @@ body {
 .demo-role-btn:last-child { margin-bottom: 0; }
 
 .demo-role-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.03));
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  display: none;
 }
 
 .demo-role-btn:hover {
@@ -937,7 +960,6 @@ body {
   box-shadow: 0 6px 20px rgba(10, 18, 42, 0.18);
 }
 
-.demo-role-btn:hover::after { opacity: 1; }
 .demo-role-btn:active { transform: scale(0.99); }
 
 .demo-role-icon {

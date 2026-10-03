@@ -31,9 +31,10 @@
   --border-strong:         rgba(10, 18, 42, 0.32);  /* Crisp high-contrast border */
   --border-blue:           rgba(29, 78, 216, 0.25); /* Subtle royal blue border */
 
-  /* ── Accent Midnight Navy Lines ─────────────────────────── */
-  --line-navy:             linear-gradient(90deg, transparent, rgba(10, 18, 42, 0.40) 20%, #0A122A 50%, rgba(10, 18, 42, 0.40) 80%, transparent 100%);
-  --line-navy-solid:       linear-gradient(90deg, #0A122A 0%, #15234E 50%, #1E3168 100%);
+  /* ── Accent Midnight Navy Lines (Solid Colors Only) ─────── */
+  --line-navy:             #0A122A;
+  --line-navy-solid:       #0A122A;
+  --border-color:          rgba(10, 18, 42, 0.18);
 
   /* ── Typography (17:1 Contrast Midnight Navy) ───────────── */
   --font-display:          'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
@@ -81,14 +82,14 @@
   --blue-500:              #2563EB;
   --blue-glow:             rgba(37, 99, 235, 0.22);
 
-  /* ── Primary Brand Gradients ─────────────────────────────── */
+  /* ── Primary Brand Colors (Solid Colors Only — No Gradients) ─ */
   --brand-primary:         #0A122A;      /* Midnight Navy */
   --brand-primary-dark:    #050917;
-  --brand-accent:          #1A2A57;
-  --brand-gradient:        linear-gradient(135deg, #0A122A 0%, #15234E 50%, #1F3472 100%);
-  --brand-gradient-warm:   linear-gradient(135deg, #0A122A 0%, #1F3472 60%, #FFF7E6 100%);
-  --brand-gradient-soft:   linear-gradient(135deg, #FFF7E6 0%, #F3E5C8 100%);
-  --brand-gradient-glow:   linear-gradient(135deg, rgba(10, 18, 42, 0.35) 0%, rgba(31, 52, 114, 0.20) 100%);
+  --brand-accent:          #0A122A;
+  --brand-gradient:        #0A122A;
+  --brand-gradient-warm:   #0A122A;
+  --brand-gradient-soft:   #FFF7E6;
+  --brand-gradient-glow:   #0A122A;
   --brand-glow:            rgba(10, 18, 42, 0.35);
 
   /* ── Semantic Colors ─────────────────────────────────────── */
@@ -187,62 +188,64 @@
   --emerald-glow:          rgba(10, 18, 42, 0.28);
 }
 
-/* ── Luxurious Midnight Navy Velvet Dark Mode ─────────────── */
+/* ── Luxurious Midnight Navy Velvet Dark Mode (Solid Colors Only) ──── */
 [data-theme="dark"] {
   --bg-base:               #050917;      /* Deepest midnight void */
   --bg-primary:            #0A122A;      /* Exact Midnight Navy canvas */
-  --bg-secondary:          #111D3E;      /* Secondary navy container */
-  --bg-surface:            #172752;      /* Elevated velvet navy card */
-  --bg-surface-2:          #1F3369;      /* Interactive elevated panel */
-  --bg-surface-3:          #2A4384;      /* Highlighted navy */
+  --bg-secondary:          #101B3B;      /* Secondary midnight navy container */
+  --bg-surface:            #16234B;      /* Elevated solid velvet navy card */
+  --bg-surface-2:          #1D2D5E;      /* Interactive elevated panel */
+  --bg-surface-3:          #263973;      /* Highlighted navy */
 
-  --glass-bg:              rgba(23, 39, 82, 0.88);
-  --glass-bg-light:        rgba(17, 29, 62, 0.70);
-  --glass-border:          rgba(255, 247, 230, 0.15);
-  --glass-border-hover:    rgba(255, 247, 230, 0.30);
+  --glass-bg:              #16234B;
+  --glass-bg-light:        #101B3B;
+  --glass-border:          rgba(255, 247, 230, 0.25);
+  --glass-border-hover:    rgba(255, 247, 230, 0.45);
 
-  --border-subtle:         rgba(255, 247, 230, 0.08);
-  --border-default:        rgba(255, 247, 230, 0.18);
-  --border-strong:         rgba(255, 247, 230, 0.32);
+  --border-subtle:         rgba(255, 247, 230, 0.18);
+  --border-default:        rgba(255, 247, 230, 0.30);
+  --border-strong:         rgba(255, 247, 230, 0.50);
+  --border-color:          rgba(255, 247, 230, 0.30);
+  --border-blue:           rgba(255, 247, 230, 0.35);
 
-  --text-primary:          #FFF7E6;      /* Exact Light Vanilla */
-  --text-secondary:        #D8CFBC;      /* Warm Vanilla Slate */
-  --text-muted:            #9FA7BC;      /* Dusty Navy */
+  --text-primary:          #FFF7E6;      /* Exact Light Vanilla: 100% visible */
+  --text-secondary:        #F5EBD8;      /* Clear high-contrast light vanilla cream */
+  --text-muted:            #D8CBBA;      /* Distinctly readable warm vanilla (not dull grey) */
   --text-inverse:          #0A122A;
 
-  --line-navy:             linear-gradient(90deg, transparent, rgba(255, 247, 230, 0.40) 20%, #FFF7E6 50%, rgba(255, 247, 230, 0.40) 80%, transparent 100%);
-  --line-navy-solid:       linear-gradient(90deg, #111D3E 0%, #1F3369 50%, #FFF7E6 100%);
+  --line-navy:             #FFF7E6;      /* Solid Light Vanilla accent line */
+  --line-navy-solid:       #FFF7E6;
 
   --brand-primary:         #FFF7E6;      /* Vanilla pops on dark navy */
   --brand-primary-dark:    #F3E5C8;
-  --brand-accent:          #3B5DA8;
-  --brand-gradient:        linear-gradient(135deg, #172752 0%, #2A4384 55%, #FFF7E6 100%);
-  --brand-gradient-warm:   linear-gradient(135deg, #0A122A 0%, #1F3369 60%, #FFF7E6 100%);
+  --brand-accent:          #FFF7E6;
+  --brand-gradient:        #FFF7E6;
+  --brand-gradient-warm:   #FFF7E6;
 
   --color-eat:             #FFF7E6;      /* Light Vanilla */
   --color-eat-subtle:      #F3E5C8;
-  --color-eat-bg:          rgba(255, 247, 230, 0.12);
-  --color-eat-bg-hover:    rgba(255, 247, 230, 0.20);
-  --color-eat-border:      rgba(255, 247, 230, 0.35);
-  --color-eat-glow:        rgba(255, 247, 230, 0.25);
+  --color-eat-bg:          rgba(255, 247, 230, 0.16);
+  --color-eat-bg-hover:    rgba(255, 247, 230, 0.26);
+  --color-eat-border:      #FFF7E6;
+  --color-eat-glow:        rgba(255, 247, 230, 0.35);
 
-  --color-skip:            #9FA7BC;
-  --color-skip-bg:         rgba(255, 247, 230, 0.08);
-  --color-skip-border:     rgba(255, 247, 230, 0.20);
+  --color-skip:            #FFF7E6;
+  --color-skip-bg:         rgba(255, 247, 230, 0.10);
+  --color-skip-border:     rgba(255, 247, 230, 0.35);
 
   --color-warning:         #FDE68A;
-  --color-warning-bg:      rgba(253, 230, 138, 0.12);
-  --color-warning-border:  rgba(253, 230, 138, 0.28);
+  --color-warning-bg:      rgba(253, 230, 138, 0.16);
+  --color-warning-border:  #FDE68A;
 
   --color-danger:          #FCA5A5;
-  --color-danger-bg:       rgba(252, 165, 165, 0.12);
-  --color-danger-border:   rgba(252, 165, 165, 0.28);
+  --color-danger-bg:       rgba(252, 165, 165, 0.16);
+  --color-danger-border:   #FCA5A5;
 
-  --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-sm:   0 2px 8px rgba(0, 0, 0, 0.40);
-  --shadow-md:   0 4px 18px rgba(0, 0, 0, 0.45);
-  --shadow-lg:   0 12px 36px rgba(0, 0, 0, 0.55);
-  --shadow-xl:   0 22px 54px rgba(0, 0, 0, 0.65);
-  --shadow-card: 0 1px 0 var(--glass-border), 0 4px 20px rgba(0, 0, 0, 0.40);
-  --emerald-glow:          rgba(255, 247, 230, 0.22);
+  --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-sm:   0 2px 8px rgba(0, 0, 0, 0.50);
+  --shadow-md:   0 4px 18px rgba(0, 0, 0, 0.55);
+  --shadow-lg:   0 12px 36px rgba(0, 0, 0, 0.65);
+  --shadow-xl:   0 22px 54px rgba(0, 0, 0, 0.75);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.50);
+  --emerald-glow:          rgba(255, 247, 230, 0.30);
 }

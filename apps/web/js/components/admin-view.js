@@ -262,7 +262,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
       <!-- Section 8.1 & 12.1: Executive KPI Grid -->
       <div class="kpi-grid" style="margin-bottom: 24px;">
         <!-- North Star Metric -->
-        <div class="kpi-card" style="border-top: 4px solid var(--color-eat); background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(46, 107, 72, 0.05) 100%);">
+        <div class="kpi-card" style="border-top: 4px solid var(--color-eat); background: var(--bg-surface);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <span class="kpi-label">⭐ North Star: Avoidable Waste / Meal</span>
             <span class="badge ${isDemo ? 'badge-eat' : 'badge-primary'}" style="font-size: 0.68rem;">
@@ -349,7 +349,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
         </div>
 
         <!-- Estimated Savings vs Baseline -->
-        <div class="kpi-card" style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(184, 93, 56, 0.05) 100%);">
+        <div class="kpi-card" style="background: var(--bg-surface);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <span class="kpi-label">Estimated Savings vs Baseline</span>
             <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Scenario Estimate</span>
@@ -722,7 +722,7 @@ function renderRoiCalculatorTab({ facility }) {
         </div>
 
         <!-- Live Output Projections -->
-        <div style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(46, 107, 72, 0.04) 100%); padding: 20px; border-radius: var(--radius-md); border: 2px solid var(--color-eat); display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: var(--bg-surface); padding: 20px; border-radius: var(--radius-md); border: 2px solid var(--color-eat); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <span style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--color-eat); letter-spacing: 0.05em;">

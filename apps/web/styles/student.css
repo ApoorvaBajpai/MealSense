@@ -58,7 +58,7 @@
 
 /* ── Value Prop Banner ─────────────────────────────────────── */
 .value-prop-banner {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FFF7E6 100%);
+  background: #FFFFFF;
   border: 1.5px solid #0A122A;
   border-radius: var(--radius-lg);
   padding: 16px 20px;
@@ -150,7 +150,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,0.025) 0%, transparent 50%);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -168,7 +168,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(10, 18, 42, 0.40) 20%, #0A122A 50%, rgba(10, 18, 42, 0.40) 80%, transparent 100%);
+  background: #0A122A;
   pointer-events: none;
 }
 
@@ -365,15 +365,8 @@
 }
 
 .response-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  display: none;
 }
-
-.response-btn:hover::after { opacity: 1; }
 .response-btn:active { transform: scale(0.97); }
 
 /* Eat button — Light Vanilla base + Midnight Navy border & pop */
@@ -395,10 +388,10 @@
 }
 
 .response-btn-eat.selected {
-  background: linear-gradient(135deg, #0A122A 0%, #15234E 50%, #1E3168 100%);
+  background: #0A122A;
   color: var(--palette-vanilla);
   border-color: #0A122A;
-  box-shadow: 0 8px 28px rgba(10, 18, 42, 0.40), inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow: 0 8px 28px rgba(10, 18, 42, 0.40);
   transform: translateY(-1px);
 }
 
@@ -430,7 +423,7 @@
 
 /* Highlighting the Impact Button in Actions Bar */
 .pill-btn-impact {
-  background: linear-gradient(135deg, #0A122A 0%, #15234E 100%) !important;
+  background: #0A122A !important;
   color: var(--palette-vanilla) !important;
   border: 1.5px solid #0A122A !important;
   font-weight: 800 !important;
@@ -438,7 +431,7 @@
 }
 
 .pill-btn-impact:hover {
-  background: linear-gradient(135deg, #15234E 0%, #1E3168 100%) !important;
+  background: #15234E !important;
   border-color: #0A122A !important;
   color: #FFFFFF !important;
   transform: translateY(-2px) !important;
@@ -510,7 +503,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--brand-gradient);
+  background: #0A122A;
 }
 
 .impact-grid {
@@ -614,9 +607,9 @@
   min-height: 4px;
 }
 
-.chart-bar-fill.active { background: linear-gradient(180deg, #15234E 0%, #0A122A 100%); }
+.chart-bar-fill.active { background: #0A122A; }
 .chart-bar-fill.current {
-  background: linear-gradient(180deg, #1E3168 0%, #0A122A 100%);
+  background: #15234E;
   box-shadow: 0 -2px 12px rgba(10, 18, 42, 0.35);
 }
 
@@ -691,7 +684,7 @@
   content: '';
   width: 14px;
   height: 2px;
-  background: var(--brand-gradient);
+  background: #0A122A;
   border-radius: var(--radius-full);
 }
 
@@ -704,8 +697,8 @@
 
 /* ── Dark Theme Overrides for Student View ─────────────────── */
 [data-theme="dark"] .value-prop-banner {
-  background: linear-gradient(135deg, #111D3E 0%, #172752 100%);
-  border: 1.5px solid rgba(255, 247, 230, 0.25);
+  background: #16234B;
+  border: 1.5px solid rgba(255, 247, 230, 0.35);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.40);
 }
 
@@ -725,7 +718,7 @@
 }
 
 [data-theme="dark"] .value-prop-sub {
-  color: var(--text-muted);
+  color: #F5EBD8;
 }
 
 [data-theme="dark"] .meal-card {
@@ -739,7 +732,7 @@
 }
 
 [data-theme="dark"] .meal-card::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 247, 230, 0.40) 20%, #FFF7E6 50%, rgba(255, 247, 230, 0.40) 80%, transparent 100%);
+  background: #FFF7E6;
 }
 
 [data-theme="dark"] .meal-card.responded-eat {
@@ -858,10 +851,43 @@
 }
 
 [data-theme="dark"] .chart-bar-fill.active {
-  background: linear-gradient(180deg, rgba(255, 247, 230, 0.60) 0%, #FFF7E6 100%);
+  background: #F5EBD8;
 }
 
 [data-theme="dark"] .chart-bar-fill.current {
   background: #FFF7E6;
   box-shadow: 0 -2px 12px rgba(255, 247, 230, 0.45);
+}
+
+[data-theme="dark"] .impact-card::after {
+  background: #FFF7E6;
+}
+
+[data-theme="dark"] .meals-section-label::before {
+  background: #FFF7E6;
+}
+
+[data-theme="dark"] .countdown-badge {
+  background: rgba(254, 243, 199, 0.15);
+  border-color: #FCD34D;
+  color: #FDE68A;
+}
+
+[data-theme="dark"] .countdown-badge.expired {
+  background: rgba(255, 247, 230, 0.08);
+  border-color: rgba(255, 247, 230, 0.25);
+  color: #D8CBBA;
+}
+
+[data-theme="dark"] .impact-stat {
+  background: var(--bg-surface);
+  border-color: var(--border-default);
+}
+
+[data-theme="dark"] .impact-stat-label {
+  color: #F5EBD8;
+}
+
+[data-theme="dark"] .chart-label {
+  color: #FFF7E6;
 }

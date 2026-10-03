@@ -223,7 +223,7 @@ export function renderKitchenView(container) {
           </div>
 
           <!-- Section 13.2: Decision-First Screen Recommendation -->
-          <div style="background: linear-gradient(135deg, rgba(184, 93, 56, 0.08) 0%, rgba(156, 75, 40, 0.04) 100%); border: 2px solid var(--brand-accent); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px;">
+          <div style="background: var(--bg-secondary); border: 2px solid var(--brand-accent); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
               <span style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: var(--brand-primary); letter-spacing: 0.05em;">
                 🎯 Intent-Weighted Demand Forecast
