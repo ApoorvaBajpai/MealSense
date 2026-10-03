@@ -375,9 +375,9 @@ async function testClosedLoopIntegration() {
     liveProvider.clearAll();
 
     // 1. Publish Meal with future cutoff
-    const today = new Date().toISOString().split('T')[0];
+    const futureDate = new Date(Date.now() + 86400000).toLocaleDateString('en-CA');
     const meal = liveProvider.createMeal({
-      mealDate: today,
+      mealDate: futureDate,
       type: 'lunch',
       name: 'Integration Test Thali',
       items: ['Paneer Makhani', 'Jeera Rice', 'Tandoori Roti'],

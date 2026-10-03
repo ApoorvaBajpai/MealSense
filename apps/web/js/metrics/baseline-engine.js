@@ -108,7 +108,54 @@ export class BaselineEngine {
         estimatedMonthlySavings: estimatedMonthlySavings ?? 0,
         provenance: PROVENANCE.SCENARIO,
         label: 'Scenario / Demo Estimate'
-      }
+      },
+      metrics: [
+        {
+          key: 'wastePerMeal',
+          name: 'Avoidable Waste per Meal',
+          baseline: `${baselineWaste.toFixed(3)} kg`,
+          current: `${currentWaste.toFixed(3)} kg`,
+          delta: `${wasteReductionPct >= 0 ? '↓' : '↑'} ${Math.abs(wasteReductionPct)}%`,
+          isGood: wasteReductionPct > 0,
+          statusLabel: 'North Star KPI'
+        },
+        {
+          key: 'overproduction',
+          name: 'Overproduction Rate',
+          baseline: `${baselineOverprod.toFixed(1)}%`,
+          current: `${currentOverprod.toFixed(1)}%`,
+          delta: `${overproductionReductionPct >= 0 ? '↓' : '↑'} ${Math.abs(overproductionReductionPct)}%`,
+          isGood: overproductionReductionPct > 0,
+          statusLabel: 'Operational Efficiency'
+        },
+        {
+          key: 'forecastMae',
+          name: 'Forecast Error (MAE)',
+          baseline: baselineMae !== null ? `${baselineMae} heads` : '—',
+          current: `${currentMae} heads`,
+          delta: maeReductionPct !== null ? `${maeReductionPct >= 0 ? '↓' : '↑'} ${Math.abs(maeReductionPct)}%` : '—',
+          isGood: maeReductionPct !== null && maeReductionPct > 0,
+          statusLabel: 'Model Accuracy'
+        },
+        {
+          key: 'shortageRate',
+          name: 'Dining Shortage Rate',
+          baseline: baselineShortage !== null ? `${baselineShortage.toFixed(2)}%` : '—',
+          current: `${currentSummary.shortageRate.toFixed(2)}%`,
+          delta: currentSummary.shortageRate < 0.5 ? 'Guardrail Met' : 'Elevated',
+          isGood: currentSummary.shortageRate < 0.5,
+          statusLabel: 'Food Security Guardrail'
+        },
+        {
+          key: 'estimatedSavings',
+          name: 'Estimated Monthly Savings',
+          baseline: '₹0 (Pre-system)',
+          current: `₹${(estimatedMonthlySavings ?? 0).toLocaleString('en-IN')}`,
+          delta: `+₹${(estimatedMonthlySavings ?? 0).toLocaleString('en-IN')}`,
+          isGood: (estimatedMonthlySavings ?? 0) > 0,
+          statusLabel: 'Defensible Savings'
+        }
+      ]
     };
   }
 }

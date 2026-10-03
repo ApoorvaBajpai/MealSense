@@ -197,8 +197,65 @@ function renderActiveTabContent(tab, data) {
 
 // ---------------- TAB 1: EXECUTIVE OVERVIEW & TRENDS ----------------
 function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, trendMae, trendResp, isDemo }) {
-  const isWasteReduced = metrics.wasteReductionPct > 0;
-  const isOverprepReduced = metrics.overproductionReductionPct > 0;
+  const wasteReductionPct = baselineComp?.wastePerMeal?.reductionPct ?? metrics.wasteReductionPct ?? 0;
+  const isWasteReduced = wasteReductionPct > 0;
+  const baselineWasteKg = baselineComp?.baseline?.wastePerMealKg ?? metrics.baselineWasteKg ?? 0.230;
+
+  const overproductionReductionPct = baselineComp?.overproduction?.reductionPct ?? metrics.overproductionReductionPct ?? 0;
+  const isOverprepReduced = overproductionReductionPct > 0;
+  const baselineOverproductionRate = baselineComp?.baseline?.overproductionRate ?? metrics.baselineOverproductionRate ?? 6.10;
+
+  const maeReductionPct = baselineComp?.forecastMae?.reductionPct ?? metrics.maeReductionPct ?? 0;
+  const estimatedSavings = baselineComp?.savings?.estimatedMonthlySavings ?? metrics.estimatedMonthlySavings ?? 0;
+  const sampleCount = metrics.totalMealsClosed ?? metrics.sampleCount ?? metrics.totalMealsServed ?? 0;
+
+  const comparisonRows = (baselineComp && Array.isArray(baselineComp.metrics)) ? baselineComp.metrics : [
+    {
+      key: 'wastePerMeal',
+      name: 'Avoidable Waste per Meal',
+      baseline: `${typeof baselineWasteKg === 'number' ? baselineWasteKg.toFixed(3) : baselineWasteKg} kg`,
+      current: `${(metrics.wastePerMealKg || 0).toFixed(3)} kg`,
+      delta: `${wasteReductionPct >= 0 ? '↓' : '↑'} ${Math.abs(wasteReductionPct)}%`,
+      isGood: wasteReductionPct > 0,
+      statusLabel: 'North Star KPI'
+    },
+    {
+      key: 'overproduction',
+      name: 'Overproduction Rate',
+      baseline: `${typeof baselineOverproductionRate === 'number' ? baselineOverproductionRate.toFixed(1) : baselineOverproductionRate}%`,
+      current: `${(metrics.overproductionRate || 0).toFixed(1)}%`,
+      delta: `${overproductionReductionPct >= 0 ? '↓' : '↑'} ${Math.abs(overproductionReductionPct)}%`,
+      isGood: overproductionReductionPct > 0,
+      statusLabel: 'Operational Efficiency'
+    },
+    {
+      key: 'forecastMae',
+      name: 'Forecast Error (MAE)',
+      baseline: `${baselineComp?.baseline?.forecastMae ?? 8.6} heads`,
+      current: `${metrics.forecastMae || 0} heads`,
+      delta: `${maeReductionPct !== null ? (maeReductionPct >= 0 ? '↓ ' : '↑ ') + Math.abs(maeReductionPct) + '%' : '—'}`,
+      isGood: maeReductionPct !== null && maeReductionPct > 0,
+      statusLabel: 'Model Accuracy'
+    },
+    {
+      key: 'shortageRate',
+      name: 'Dining Shortage Rate',
+      baseline: `${baselineComp?.baseline?.shortageRate ?? 0.40}%`,
+      current: `${(metrics.shortageRate || 0).toFixed(1)}%`,
+      delta: `${metrics.shortageRate <= (baselineComp?.baseline?.shortageRate ?? 0.40) ? 'Maintained' : 'Elevated'}`,
+      isGood: metrics.shortageRate <= 0.5,
+      statusLabel: 'Food Security Guardrail'
+    },
+    {
+      key: 'estimatedSavings',
+      name: 'Estimated Monthly Savings',
+      baseline: '₹0 (Pre-system)',
+      current: `₹${estimatedSavings.toLocaleString('en-IN')}`,
+      delta: `+₹${estimatedSavings.toLocaleString('en-IN')}`,
+      isGood: estimatedSavings > 0,
+      statusLabel: 'Scenario Estimate'
+    }
+  ];
 
   return `
     <div>
@@ -216,7 +273,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
             ${metrics.wastePerMealKg} <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">kg / meal</span>
           </div>
           <span class="kpi-delta ${isWasteReduced ? 'delta-good' : 'delta-bad'}">
-            ${isWasteReduced ? '↓' : '↑'} ${Math.abs(metrics.wasteReductionPct)}% vs Baseline (${metrics.baselineWasteKg} kg)
+            ${isWasteReduced ? '↓' : '↑'} ${Math.abs(wasteReductionPct)}% vs Baseline (${baselineWasteKg} kg)
           </span>
           <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
             Provenance: Calculated from ${isDemo ? 'demo seed' : 'logged outcomes'}
@@ -231,7 +288,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
           </div>
           <div class="kpi-value">${metrics.overproductionRate}%</div>
           <span class="kpi-delta ${isOverprepReduced ? 'delta-good' : 'delta-bad'}">
-            ${isOverprepReduced ? '↓' : '↑'} ${Math.abs(metrics.overproductionReductionPct)}% vs Baseline (${metrics.baselineOverproductionRate}%)
+            ${isOverprepReduced ? '↓' : '↑'} ${Math.abs(overproductionReductionPct)}% vs Baseline (${baselineOverproductionRate}%)
           </span>
           <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
             Provenance: Derived from (prepared - actual diners) / prepared
@@ -246,7 +303,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
           </div>
           <div class="kpi-value">${metrics.forecastMae} <span style="font-size: 0.9rem; color: var(--text-muted);">heads</span></div>
           <span class="kpi-delta delta-good">
-            ↓ ${metrics.maeReductionPct}% error reduction vs baseline
+            ↓ ${maeReductionPct}% error reduction vs baseline
           </span>
           <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;">
             Provenance: Mean |prediction - actual| across recorded meals
@@ -298,7 +355,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
             <span class="badge" style="font-size: 0.68rem; background: var(--bg-secondary);">Scenario Estimate</span>
           </div>
           <div class="kpi-value" style="color: var(--brand-primary);">
-            ₹${metrics.estimatedMonthlySavings.toLocaleString('en-IN')}
+            ₹${estimatedSavings.toLocaleString('en-IN')}
           </div>
           <span class="kpi-delta delta-good">
             ₹${facility.costPerServing}/serving avoided overprep
@@ -321,7 +378,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
             </span>
           </div>
           <span class="badge badge-eat" style="font-size: 0.74rem;">
-            Sample Size: ${metrics.sampleCount} Meals Evaluated
+            Sample Size: ${sampleCount} Meals Evaluated
           </span>
         </div>
 
@@ -337,7 +394,7 @@ function renderOverviewTab({ facility, metrics, baselineComp, tf, trendWaste, tr
               </tr>
             </thead>
             <tbody>
-              ${baselineComp.metrics.map(row => `
+              ${comparisonRows.map(row => `
                 <tr ${row.key === 'estimatedSavings' ? 'style="background: rgba(184, 93, 56, 0.04); font-weight: 600;"' : ''}>
                   <td><strong>${row.name}</strong></td>
                   <td>${row.baseline}</td>
